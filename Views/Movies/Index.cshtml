@@ -1,41 +1,91 @@
-@model IEnumerable<MyHorrorMovieApp.Models.Movie>
+@* @model IEnumerable<MyHorrorMovieApp.Models.Movie>
 
 @{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "Index";
 }
 
 <h1>Index</h1>
+<p>
+<a href="/logout">Logout</a>
+</p>
 
 <p>
-    <a asp-action="Create">Create New</a>
+<a asp-action="Create">Create New</a>
 </p>
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<thead>
+<tr>
+<th>
+@Html.DisplayNameFor(model => model.Title)
+</th>
+<th>
+@Html.DisplayNameFor(model => model.Image)
+</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+@foreach (var item in Model)
+{
+<tr>
+<td>
+@Html.DisplayFor(modelItem => item.Title)
+</td>
+<td>
+@Html.DisplayFor(modelItem => item.Image)
+</td>
+<td>
+<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+<a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+</td>
+</tr>
 }
-    </tbody>
-</table>
+</tbody>
+</table> *@
+
+@model IEnumerable<MyHorrorMovieApp.Models.Movie>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Movies Index</title>
+    <!-- Your head content here -->
+</head>
+
+<body>
+    <!-- Navigation bar or logout link -->
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <form method="post" action="/logout">
+                <button type="submit">Logout</button>
+            </form>
+
+        </ul>
+    </nav>
+
+    <h1>Movies Index</h1>
+
+    <!-- Display each movie and its details -->
+    @foreach (var movie in Model)
+    {
+        <div class="movie-card">
+            <h2>@movie.Title</h2>
+            <img src="@movie.Image" alt="@movie.Title" />
+            <h3>Reviews</h3>
+            <ul>
+                @foreach (var review in movie.Reviews)
+                {
+                    <li>@review.Comment</li>
+                }
+            </ul>
+            <!-- Add additional movie details as needed -->
+        </div>
+    }
+
+    <!-- Your script references and other content here -->
+</body>
+
+</html>

@@ -65,12 +65,20 @@ namespace MyHorrorMovieApp.Controllers
     //   return Ok("Registration successful");
     // }
 
-    // [HttpPost("logout")]
-    // public IActionResult Logout()
-    // {
-    //   // Logic for handling user logout
-    //   return Ok("Logout successful");
-    // }
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+      // Clear the "token" cookie by setting its expiration time to a past date
+      Response.Cookies.Append("token", "", new CookieOptions
+      {
+        Expires = DateTime.UtcNow.AddDays(-1),
+        HttpOnly = true,
+        Secure = true, // Set to true if using HTTPS
+        SameSite = SameSiteMode.Strict
+      });
+
+      return RedirectToAction("Login", "Auth");
+    }
   }
 }
 

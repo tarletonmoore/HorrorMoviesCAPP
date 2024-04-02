@@ -32,23 +32,6 @@ namespace MyHorrorMovieApp.Services
       return user != null;
     }
 
-
-    // public string GenerateJwtToken(string username)
-    // {
-    //   var tokenHandler = new JwtSecurityTokenHandler();
-    //   var key = Encoding.ASCII.GetBytes(_secretKey);
-    //   var tokenDescriptor = new SecurityTokenDescriptor
-    //   {
-    //     Subject = new ClaimsIdentity(new Claim[]
-    //       {
-    //                 new Claim(ClaimTypes.Name, username)
-    //       }),
-    //     Expires = DateTime.UtcNow.AddDays(1), // Token expiration time
-    //     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-    //   };
-    //   var token = tokenHandler.CreateToken(tokenDescriptor);
-    //   return tokenHandler.WriteToken(token);
-    // }
     public string GenerateJwtToken(string username)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
