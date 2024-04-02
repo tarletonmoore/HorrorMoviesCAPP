@@ -12,8 +12,9 @@ namespace MyHorrorMovieApp.Models
     [Required]
     [MinLength(3)]
     public string Comment { get; set; } = "";
-
+    [Required]
     public Movie Movie { get; set; }
+    [Required]
     public User User { get; set; }
   }
 }

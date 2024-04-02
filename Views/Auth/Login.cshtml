@@ -1,0 +1,8 @@
+﻿@page
+@model MyHorrorMovieApp.Login
+
+<form method="post" action="/login">
+  <input type="text" id="username" name="Username" asp-for="Username" placeholder="Username" />
+  <input type="password" id="password" name="Password" asp-for="Password" placeholder="Password" />
+  <button type="submit">Login</button>
+</form>

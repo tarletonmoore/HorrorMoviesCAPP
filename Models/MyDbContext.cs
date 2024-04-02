@@ -42,6 +42,8 @@ namespace MyHorrorMovieApp.Models
           new Review { Id = 2, UserId = 2, MovieId = 2, Comment = "It is ok" },
           new Review { Id = 3, UserId = 1, MovieId = 2, Comment = "Great creature feature movie!" }
       );
+      modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+
     }
   }
 }
