@@ -1,49 +1,3 @@
-@* @model IEnumerable<MyHorrorMovieApp.Models.Movie>
-
-@{
-ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-<p>
-<a href="/logout">Logout</a>
-</p>
-
-<p>
-<a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-<thead>
-<tr>
-<th>
-@Html.DisplayNameFor(model => model.Title)
-</th>
-<th>
-@Html.DisplayNameFor(model => model.Image)
-</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-@foreach (var item in Model)
-{
-<tr>
-<td>
-@Html.DisplayFor(modelItem => item.Title)
-</td>
-<td>
-@Html.DisplayFor(modelItem => item.Image)
-</td>
-<td>
-<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-<a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-</td>
-</tr>
-}
-</tbody>
-</table> *@
-
 @model IEnumerable<MyHorrorMovieApp.Models.Movie>
 
 <!DOCTYPE html>
@@ -67,25 +21,59 @@ ViewData["Title"] = "Index";
     </nav>
 
     <h1>Movies Index</h1>
-
     <!-- Display each movie and its details -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Define the submitReview function in the global scope
+            window.submitReview = function (movieId) {
+                var formData = $('#reviewForm_' + movieId).serialize();
+                console.log(formData);
+                $.ajax({
+                    url: '/Review/Create',
+                    type: 'POST',
+                    data: formData,
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        // Optionally handle error here
+                    }
+                });
+            };
+        });
+    </script>
     @foreach (var movie in Model)
     {
         <div class="movie-card">
             <h2>@movie.Title</h2>
-            <img src="@movie.Image" alt="@movie.Title" />
+            <img src="@movie.Image" alt="@movie.Title" width="300px" />
             <h3>Reviews</h3>
             <ul>
                 @foreach (var review in movie.Reviews)
                 {
-                    <li>@review.Comment</li>
+                    <li>@review.User.Username: @review.Comment</li>
                 }
             </ul>
-            <!-- Add additional movie details as needed -->
+
+            <form method="post" action="/Review/Create">
+                <input type="hidden" id="MovieId" name="MovieId" value="@movie.Id" />
+                <input type="text" id="Comment" name="Comment" />
+                <button type="submit">Add Review</button>
+            </form>
         </div>
+        @* <form id="reviewForm_@movie.Id">
+    <input type="hidden" name="MovieId" value="@movie.Id" />
+    <input type="text" name="Comment" />
+    <button type="button" onclick="submitReview(@movie.Id)">Add Review</button>
+    </form> *@
+        @* </div> *@
     }
 
-    <!-- Your script references and other content here -->
+
+    }
+
+
 </body>
 
 </html>

@@ -168,5 +168,12 @@ app.MapControllerRoute(
     pattern: "{controller=Auth}/{action=Login}"
 );
 
+app.MapControllerRoute(
+    name: "reviews",
+    pattern: "Review/Create",
+    defaults: new { controller = "Reviews", action = "Create" }
+);
+
+
 
 app.Run();

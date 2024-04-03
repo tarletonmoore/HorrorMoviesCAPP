@@ -21,7 +21,12 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Movies.ToListAsync());
+            var moviesWithReviewsAndUsers = await _context.Movies
+                .Include(m => m.Reviews) // Include Reviews
+                    .ThenInclude(r => r.User) // Include User associated with each Review
+                .ToListAsync();
+
+            return View(moviesWithReviewsAndUsers);
         }
 
         // GET: Movies/Details/5

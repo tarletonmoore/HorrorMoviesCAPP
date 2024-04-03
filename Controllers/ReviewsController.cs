@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
+using System.Security.Claims;
+
 
 namespace MyHorrorMovieApp.Controllers
 {
@@ -53,23 +55,72 @@ namespace MyHorrorMovieApp.Controllers
             return View();
         }
 
-        // POST: Reviews/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> Create([Bind("Id,MovieId,Comment")] Review review)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         // Get the current user's ID
+        //         string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        //         // Assign the current user's ID to the review
+        //         review.UserId = int.Parse(currentUserId);
+
+        //         _context.Add(review);
+        //         await _context.SaveChangesAsync();
+
+        //         // Redirect back to the movies index page
+        //         return RedirectToAction("Index", "Movies");
+        //     }
+        //     // If model state is not valid, return the view with errors
+        //     return View(review);
+        // }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MovieId,UserId,Comment")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,MovieId,Comment")] Review review)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                // Handle the case where the user is not authenticated
+                // For example, redirect to the login page
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Retrieve the current user's ID
+            string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (ModelState.IsValid)
             {
-                _context.Add(review);
+                // Assign the current user's ID to the review
+                review.UserId = int.Parse(currentUserId);
+
+                // Add the review to the DbContext
+                _context.Reviews.Add(review);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                // Redirect back to the movies index page
+                return RedirectToAction("Index", "Movies");
             }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Image", review.MovieId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Password", review.UserId);
+
+            // Log model state errors
+            foreach (var modelStateEntry in ModelState.Values)
+            {
+                foreach (var error in modelStateEntry.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+
+
+            // If model state is not valid, return the view with errors
             return View(review);
         }
+
 
         // GET: Reviews/Edit/5
         public async Task<IActionResult> Edit(int? id)
