@@ -26,6 +26,7 @@ namespace MyHorrorMovieApp.Models
           .WithMany(m => m.Reviews)
           .HasForeignKey(r => r.MovieId);
 
+
       // Seed data
       modelBuilder.Entity<User>().HasData(
           new User { Id = 1, Username = "tarleton", Password = "password" },
@@ -43,6 +44,8 @@ namespace MyHorrorMovieApp.Models
           new Review { Id = 3, UserId = 1, MovieId = 2, Comment = "Great creature feature movie!" }
       );
       modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+
+      base.OnModelCreating(modelBuilder);
 
     }
   }

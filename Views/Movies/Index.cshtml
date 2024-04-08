@@ -5,11 +5,9 @@
 
 <head>
     <title>Movies Index</title>
-    <!-- Your head content here -->
 </head>
 
 <body>
-    <!-- Navigation bar or logout link -->
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
@@ -23,26 +21,72 @@
     <h1>Movies Index</h1>
     <!-- Display each movie and its details -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            // Define the submitReview function in the global scope
-            window.submitReview = function (movieId) {
-                var formData = $('#reviewForm_' + movieId).serialize();
-                console.log(formData);
-                $.ajax({
-                    url: '/Review/Create',
-                    type: 'POST',
-                    data: formData,
-                    success: function (data) {
-                        location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        // Optionally handle error here
+        function submitReview(movieId) {
+            // Retrieve the JWT token from the URL query parameter
+            var token = getParameterByName('token');
+            console.log(token);
+            // Check if token exists
+            if (!token) {
+                console.error('JWT token not found in URL.');
+                return;
+            }
+
+            // Split the token into its components (header, payload, signature)
+            const [header, payload, signature] = token.split('.');
+
+            // Decode and parse the payload to get user ID
+            const decodedPayload = JSON.parse(atob(payload));
+            console.log('Decoded Payload:', decodedPayload);
+
+            // Now you have the user ID, you can use it as needed
+
+            var formData = $('#reviewForm_' + movieId).serialize();
+            console.log(formData);
+            fetch('/Reviews/Create', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + token // Include token in Authorization header
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Review created successfully:', data);
+                    if (data.success) {
+                        // Redirect to the movies index page
+                        window.location.href = '/Movies';
+                    } else {
+                        console.error('Error creating review:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating review:', error);
+                    // Optionally handle error here
                 });
-            };
-        });
+        }
+        // Function to retrieve query parameter value by name
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
     </script>
+
+
+
     @foreach (var movie in Model)
     {
         <div class="movie-card">
@@ -56,22 +100,16 @@
                 }
             </ul>
 
-            <form method="post" action="/Review/Create">
-                <input type="hidden" id="MovieId" name="MovieId" value="@movie.Id" />
-                <input type="text" id="Comment" name="Comment" />
-                <button type="submit">Add Review</button>
+            <form id="reviewForm_@movie.Id">
+                <input type="hidden" name="MovieId" value="@movie.Id" />
+                <input type="text" name="Comment" />
+                <button type="button" onclick="submitReview(@movie.Id)">Add Review</button>
             </form>
+            <br></br>
         </div>
-        @* <form id="reviewForm_@movie.Id">
-    <input type="hidden" name="MovieId" value="@movie.Id" />
-    <input type="text" name="Comment" />
-    <button type="button" onclick="submitReview(@movie.Id)">Add Review</button>
-    </form> *@
-        @* </div> *@
     }
 
 
-    }
 
 
 </body>

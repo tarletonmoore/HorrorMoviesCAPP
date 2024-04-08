@@ -1,80 +1,3 @@
-// using Microsoft.AspNetCore.Authentication.JwtBearer;
-// using Microsoft.EntityFrameworkCore;
-// using Microsoft.Extensions.DependencyInjection;
-// using Microsoft.Extensions.Hosting;
-// using Microsoft.IdentityModel.Tokens;
-// using MyHorrorMovieApp.Models;
-// using MyHorrorMovieApp.Services;
-// using System;
-// using System.Text;
-// using Microsoft.Extensions.FileProviders.Physical;
-
-// var builder = WebApplication.CreateBuilder(args);
-
-// // Add services to the container.
-// builder.Services.AddDbContext<MyDbContext>(options =>
-// {
-//   options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-// });
-
-// // Generate a secret key
-// var secretKeyGenerator = new SecretKeyGenerator();
-// var secretKey = secretKeyGenerator.GenerateSecretKey(32);
-// Console.WriteLine("Generated Secret Key: " + secretKey);
-
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//       options.TokenValidationParameters = new TokenValidationParameters
-//       {
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         ValidateLifetime = true,
-//         ValidateIssuerSigningKey = true,
-//         ValidIssuer = "http://localhost:5062",
-//         ValidAudience = "http://localhost:5062",
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-//       };
-//     });
-
-// builder.Services.AddControllersWithViews();
-
-// var app = builder.Build();
-
-// // Configure the HTTP request pipeline.
-// if (!app.Environment.IsDevelopment())
-// {
-//   app.UseExceptionHandler("/Error");
-//   app.UseHsts();
-// }
-
-// app.UseHttpsRedirection();
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//   FileProvider = new PhysicalFileProvider(
-//         Path.Combine(env.ContentRootPath, "Views")),
-//   RequestPath = "/Views"
-// });
-
-
-// app.UseRouting();
-
-// app.MapControllerRoute(
-//     name: "login",
-//     pattern: "login",
-//     defaults: new { controller = "Auth", action = "Login" }
-// );
-
-
-// app.UseAuthentication();
-// app.UseAuthorization();
-
-// app.MapControllerRoute(
-//     name: "default",
-//     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// app.Run();
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -87,10 +10,6 @@ using MyHorrorMovieApp.Services;
 using System;
 using System.IO;
 using System.Text;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Builder;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,6 +42,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidAudience = "http://localhost:5062",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
       };
+
+      options.Events = new JwtBearerEvents
+      {
+        OnAuthenticationFailed = context =>
+        {
+          // Log authentication failure with additional information
+          Console.WriteLine("Authentication failed: " + context.Exception.Message);
+
+          // Log token and headers for debugging
+          Console.WriteLine("Token: " + context.Request.Headers["Authorization"]);
+
+          return Task.CompletedTask;
+        },
+        // Add other event handlers as needed
+      };
     });
 
 builder.Services.AddControllersWithViews();
@@ -145,9 +79,12 @@ app.UseStaticFiles(new StaticFileOptions
   RequestPath = "/static"
 });
 
-
 app.UseRouting();
 
+// Enable CORS (Cross-Origin Resource Sharing)
+app.UseCors(options => options.WithOrigins("http://localhost:5062").AllowAnyMethod().AllowAnyHeader());
+
+// Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -170,10 +107,8 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "reviews",
-    pattern: "Review/Create",
+    pattern: "Reviews/Create",
     defaults: new { controller = "Reviews", action = "Create" }
 );
-
-
 
 app.Run();

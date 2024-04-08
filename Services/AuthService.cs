@@ -32,7 +32,8 @@ namespace MyHorrorMovieApp.Services
       return user != null;
     }
 
-    public string GenerateJwtToken(string username)
+
+    public string GenerateJwtToken(int userId)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
       var key = Encoding.ASCII.GetBytes(_secretKey);
@@ -41,10 +42,12 @@ namespace MyHorrorMovieApp.Services
       {
         Subject = new ClaimsIdentity(new Claim[]
           {
-            new Claim(ClaimTypes.Name, username)
+            new Claim("userId", userId.ToString()) // Include user ID in the JWT payload
           }),
-        Expires = DateTime.UtcNow.AddDays(1), // Token expiration time
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        Expires = DateTime.UtcNow.AddDays(1),
+        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+        Audience = "http://localhost:5062", // Set the audience claim
+        Issuer = "http://localhost:5062" // Set the issuer
       };
 
       var token = tokenHandler.CreateToken(tokenDescriptor);

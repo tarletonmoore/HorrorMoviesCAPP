@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 
 namespace MyHorrorMovieApp.Controllers
@@ -56,70 +57,55 @@ namespace MyHorrorMovieApp.Controllers
         }
 
 
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("Id,MovieId,Comment")] Review review)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         // Get the current user's ID
-        //         string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        //         // Assign the current user's ID to the review
-        //         review.UserId = int.Parse(currentUserId);
-
-        //         _context.Add(review);
-        //         await _context.SaveChangesAsync();
-
-        //         // Redirect back to the movies index page
-        //         return RedirectToAction("Index", "Movies");
-        //     }
-        //     // If model state is not valid, return the view with errors
-        //     return View(review);
-        // }
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MovieId,Comment")] Review review)
+        public async Task<IActionResult> Create(Review review)
         {
-            if (!User.Identity.IsAuthenticated)
+            Console.WriteLine("Received POST request to /Review/Create");
+
+            // Extract userId from the JWT token payload
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            var audience = jsonToken.Audiences.FirstOrDefault();
+            if (audience != null)
             {
-                // Handle the case where the user is not authenticated
-                // For example, redirect to the login page
-                return RedirectToAction("Login", "Account");
+                Console.WriteLine($"Audience: {audience}");
+            }
+            else
+            {
+                Console.WriteLine("Audience claim not found in the token.");
             }
 
-            // Retrieve the current user's ID
-            string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = Convert.ToInt32(jsonToken.Claims.First(claim => claim.Type == "userId").Value);
 
-            if (ModelState.IsValid)
+            review.UserId = userId;
+
+            // Retrieve the movie associated with the review
+            var movie = await _context.Movies.FindAsync(review.MovieId);
+
+            if (movie == null)
             {
-                // Assign the current user's ID to the review
-                review.UserId = int.Parse(currentUserId);
-
-                // Add the review to the DbContext
-                _context.Reviews.Add(review);
-
-                // Save changes to the database
-                await _context.SaveChangesAsync();
-
-                // Redirect back to the movies index page
-                return RedirectToAction("Index", "Movies");
+                // Return a JSON response with an error message
+                return Json(new { success = false, message = "Movie not found" });
             }
 
-            // Log model state errors
-            foreach (var modelStateEntry in ModelState.Values)
-            {
-                foreach (var error in modelStateEntry.Errors)
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
-            }
+            // Assign the movie to the review
+            review.Movie = movie;
 
+            // Add the review to the DbContext
+            _context.Reviews.Add(review);
 
-            // If model state is not valid, return the view with errors
-            return View(review);
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            // Return a JSON response indicating success
+            return Json(new { success = true });
         }
+
+
+
+
 
 
         // GET: Reviews/Edit/5

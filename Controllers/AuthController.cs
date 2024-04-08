@@ -9,10 +9,12 @@ namespace MyHorrorMovieApp.Controllers
   public class AuthController : Controller
   {
     private readonly AuthService _authService;
+    private readonly MyDbContext _context;
 
-    public AuthController(AuthService authService)
+    public AuthController(AuthService authService, MyDbContext context)
     {
       _authService = authService;
+      _context = context;
     }
 
     [HttpGet("login")] // Allow GET requests to /login
@@ -22,35 +24,35 @@ namespace MyHorrorMovieApp.Controllers
       return View();
     }
 
+
+
     [HttpPost("login")]
     public IActionResult Login(Login model)
     {
-      Console.WriteLine("ModelState IsValid: " + ModelState.IsValid);
-      foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-      {
-        Console.WriteLine("Error: " + error.ErrorMessage);
-      }
-
+      // Validate the model
       if (!ModelState.IsValid)
       {
         // Model validation failed, return the view with validation errors
         return View(model);
       }
 
-      if (!_authService.IsValidCredentials(model.Username, model.Password))
+      // Validate the user credentials and retrieve the user ID
+      var user = _context.Users.SingleOrDefault(u => u.Username == model.Username && u.Password == model.Password);
+      if (user == null)
       {
         ModelState.AddModelError("", "Invalid username or password");
         return View(model);
       }
 
-      // Generate a JWT token
-      var token = _authService.GenerateJwtToken(model.Username);
+      // Generate a JWT token with the user ID
+      var token = _authService.GenerateJwtToken(user.Id);
+
       // Set a cookie containing the token
       Response.Cookies.Append("token", token, new CookieOptions
       {
         HttpOnly = true,
         Secure = true, // Set to true if using HTTPS
-        SameSite = SameSiteMode.Strict // Adjust as needed
+        SameSite = SameSiteMode.Lax // Adjust as needed
       });
 
       // Redirect to the "Index" action method of the "Movies" controller after successful login
