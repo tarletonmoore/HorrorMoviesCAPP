@@ -111,4 +111,10 @@ app.MapControllerRoute(
     defaults: new { controller = "Reviews", action = "Create" }
 );
 
+app.MapControllerRoute(
+    name: "reviews",
+    pattern: "Reviews/Delete/{id}",
+    defaults: new { controller = "Reviews", action = "Delete" }
+);
+
 app.Run();

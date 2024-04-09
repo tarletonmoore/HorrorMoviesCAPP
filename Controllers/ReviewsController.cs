@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Newtonsoft.Json;
 
 
 namespace MyHorrorMovieApp.Controllers
@@ -105,9 +106,6 @@ namespace MyHorrorMovieApp.Controllers
 
 
 
-
-
-
         // GET: Reviews/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -164,39 +162,69 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // GET: Reviews/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // public async Task<IActionResult> Delete(int? id)
+        // {
+        //     if (id == null)
+        //     {
+        //         return NotFound();
+        //     }
+
+        //     var review = await _context.Reviews
+        //         .Include(r => r.Movie)
+        //         .Include(r => r.User)
+        //         .FirstOrDefaultAsync(m => m.Id == id);
+        //     if (review == null)
+        //     {
+        //         return NotFound();
+        //     }
+
+        //     return View(review);
+        // }
+
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                var review = await _context.Reviews.FindAsync(id);
 
-            var review = await _context.Reviews
-                .Include(r => r.Movie)
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (review == null)
-            {
-                return NotFound();
-            }
+                if (review == null)
+                {
+                    return Json(new { success = false, message = "Review not found" });
+                }
 
-            return View(review);
-        }
-
-        // POST: Reviews/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var review = await _context.Reviews.FindAsync(id);
-            if (review != null)
-            {
                 _context.Reviews.Remove(review);
-            }
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred while deleting review:", ex);
+                return StatusCode(500, "An error occurred while deleting the review.");
+            }
         }
+
+
+
+
+        // Method to check if the current user is the owner of the review
+        public bool IsCurrentUserReviewOwner(Review review, string userId)
+        {
+            // System.Console.WriteLine("USER ID!!!!!!", userId);
+            if (userId != null && int.TryParse(userId, out int parsedUserId))
+            {
+                return review.UserId == parsedUserId;
+            }
+            else
+            {
+                // Handle the case where userId is null or not a valid integer
+                return false;
+            }
+        }
+
+
 
         private bool ReviewExists(int id)
         {

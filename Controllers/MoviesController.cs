@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MyHorrorMovieApp.Controllers
 {
@@ -19,15 +21,49 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // GET: Movies
+
         public async Task<IActionResult> Index()
         {
-            var moviesWithReviewsAndUsers = await _context.Movies
-                .Include(m => m.Reviews) // Include Reviews
-                    .ThenInclude(r => r.User) // Include User associated with each Review
-                .ToListAsync();
+            // Retrieve the token from the query string
+            string token = HttpContext.Request.Query["token"];
 
-            return View(moviesWithReviewsAndUsers);
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return BadRequest("JWT token is missing or invalid.");
+            }
+
+            try
+            {
+                // Parse and validate the token
+                var handler = new JwtSecurityTokenHandler();
+                var decodedToken = handler.ReadJwtToken(token);
+
+                // Retrieve the user ID from the token's payload
+                var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+                // Set the user ID in ViewData to make it available in the view
+                ViewData["UserId"] = userId;
+                System.Console.WriteLine("USERID!!!!!!!!!:", userId);
+
+                // Retrieve movies with reviews and users asynchronously
+                var moviesWithReviewsAndUsers = await _context.Movies
+                    .Include(m => m.Reviews)
+                        .ThenInclude(r => r.User)
+                    .ToListAsync();
+
+                // Return the view with movies data
+                return View(moviesWithReviewsAndUsers);
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during token parsing or validation
+                // For example, return an error response or log the exception
+                return StatusCode(500, "An error occurred while processing the JWT token.");
+            }
         }
+
+
 
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
