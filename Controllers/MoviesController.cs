@@ -44,7 +44,9 @@ namespace MyHorrorMovieApp.Controllers
 
                 // Set the user ID in ViewData to make it available in the view
                 ViewData["UserId"] = userId;
-                System.Console.WriteLine("USERID!!!!!!!!!:", userId);
+                ViewData["Token"] = token;
+
+                Console.WriteLine("Index Token!!!!!!!!!: {0}", token);
 
                 // Retrieve movies with reviews and users asynchronously
                 var moviesWithReviewsAndUsers = await _context.Movies
@@ -86,24 +88,35 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Movies/Create
         public IActionResult Create()
         {
+            string token = HttpContext.Request.Query["token"];
+
+            // Pass the token to the Create view
+            ViewData["Token"] = token;
+            Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
             return View();
         }
 
         // POST: Movies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Image")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Title,Image")] Movie movie)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Return validation errors if model state is invalid
+            }
+
+            try
             {
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Ok(new { success = true }); // Return success response
             }
-            return View(movie);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while saving the movie." }); // Return error response
+            }
         }
+
 
         // GET: Movies/Edit/5
         public async Task<IActionResult> Edit(int? id)

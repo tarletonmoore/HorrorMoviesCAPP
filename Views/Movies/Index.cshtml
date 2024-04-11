@@ -9,14 +9,23 @@
 
 <body>
     <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <form method="post" action="/logout">
-                <button type="submit">Logout</button>
-            </form>
-
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="display: inline-block; margin-right: 10px;">
+                <form method="post" action="/logout">
+                    <button type="submit"
+                        style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+                </form>
+            </li>
+            <li style="display: inline-block;">
+                <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                    <button
+                        style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Add
+                        Movie</button>
+                </a>
+            </li>
         </ul>
     </nav>
+
 
     <h1>Movies Index</h1>
     <!-- Display each movie and its details -->
