@@ -102,8 +102,20 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "movies",
+    pattern: "Movies/Details/{id}",
+    defaults: new { controller = "Movies", action = "Details" }
+);
+
+app.MapControllerRoute(
+    name: "movies",
     pattern: "Movies/Create",
     defaults: new { controller = "Movies", action = "Create" }
+);
+
+app.MapControllerRoute(
+    name: "movies",
+    pattern: "Movies/Edit/{id}",
+    defaults: new { controller = "Movies", action = "Edit" }
 );
 
 app.MapControllerRoute(

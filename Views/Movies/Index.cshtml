@@ -144,23 +144,25 @@
         <div class="movie-card">
             <h2>@movie.Title</h2>
             <img src="@movie.Image" alt="@movie.Title" width="300px" />
+            <br />
+            <a href="/Movies/Details/@movie.Id?token=@ViewData["Token"]" style="text-decoration: none;">
+                <button
+                    style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Movie
+                    Details</button>
+            </a>
             <h3>Reviews</h3>
             <ul>
 
                 @foreach (var review in movie.Reviews)
                 {
-                    <li>@review.User.Username: @review.Comment</li>
-                    @* <li>review user id: @review.UserId</li>
-            <li>view data user id: @ViewData["UserId"]</li> *@
-
-                    @if (ViewData["UserId"].ToString() == review.UserId.ToString())
-                    {
-
-                        <form onsubmit="return false;">
-                            <button type="submit" onclick="deleteReview(@review.Id)">Delete Review</button>
-                        </form>
-
-                    }
+                    <li>
+                        <span>@review.User.Username: @review.Comment</span>
+                        @if (ViewData["UserId"].ToString() == review.UserId.ToString())
+                        {
+                            <button class="delete-button" onclick="deleteReview(@review.Id)">X</button>
+                        }
+                    </li>
+                    <br />
                 }
             </ul>
 
@@ -179,3 +181,16 @@
 </body>
 
 </html>
+
+<style>
+    .delete-button {
+        background-color: lightgray;
+        border: 1px solid #ccc;
+        color: #cc0000;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-left: 5px;
+    }
+</style>

@@ -67,16 +67,35 @@ namespace MyHorrorMovieApp.Controllers
 
 
 
-        // GET: Movies/Details/5
+        // // GET: Movies/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
+            string token = HttpContext.Request.Query["token"];
+
+            ViewData["Token"] = token;
+            // Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
+
             if (id == null)
             {
                 return NotFound();
             }
 
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Set the user ID in ViewData to make it available in the view
+            ViewData["UserId"] = userId;
+
+            // Retrieve the movie from the database based on the id
             var movie = await _context.Movies
+                .Include(m => m.Reviews) // Include reviews related to the movie
+                    .ThenInclude(r => r.User) // Include users related to each review
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (movie == null)
             {
                 return NotFound();
@@ -85,6 +104,7 @@ namespace MyHorrorMovieApp.Controllers
             return View(movie);
         }
 
+
         // GET: Movies/Create
         public IActionResult Create()
         {
@@ -92,7 +112,7 @@ namespace MyHorrorMovieApp.Controllers
 
             // Pass the token to the Create view
             ViewData["Token"] = token;
-            Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
+            // Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
             return View();
         }
 
@@ -121,6 +141,10 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Movies/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            string token = HttpContext.Request.Query["token"];
+
+            // Pass the token to the Create view
+            ViewData["Token"] = token;
             if (id == null)
             {
                 return NotFound();
@@ -138,9 +162,18 @@ namespace MyHorrorMovieApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image")] Movie movie)
         {
+            string token = HttpContext.Request.Query["token"];
+
+            // Pass the token to the Create view
+            ViewData["Token"] = token;
+            System.Console.WriteLine("TOKEN!!!: {0}", token);
+            System.Console.WriteLine("ID!!!: {0}", id);
+            System.Console.WriteLine("Title!!!: {0}", movie.Title);
+            System.Console.WriteLine("Image!!!: {0}", movie.Image);
+
+
             if (id != movie.Id)
             {
                 return NotFound();
@@ -152,6 +185,7 @@ namespace MyHorrorMovieApp.Controllers
                 {
                     _context.Update(movie);
                     await _context.SaveChangesAsync();
+                    return Ok(); // Assuming you return HTTP 200 OK status to indicate success
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -164,10 +198,10 @@ namespace MyHorrorMovieApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(movie);
+            return BadRequest(ModelState);
         }
+
 
         // GET: Movies/Delete/5
         public async Task<IActionResult> Delete(int? id)

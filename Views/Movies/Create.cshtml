@@ -4,9 +4,20 @@
     ViewData["Title"] = "Create";
 }
 @{
-    // Retrieve the token from ViewData
     string token = ViewData["Token"] as string;
 }
+
+<nav>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="display: inline-block; margin-right: 10px;">
+            <form method="post" action="/logout">
+                <button type="submit"
+                    style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+            </form>
+        </li>
+
+    </ul>
+</nav>
 
 <h1>Create</h1>
 
@@ -52,13 +63,12 @@
 
         const formData = new FormData(this);
 
-        // Make AJAX request to submit form data
         fetch('/Movies/Create', {
             method: 'POST',
             body: formData,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': 'Bearer ' + '@token' // Ensure token is enclosed in quotes
+                'Authorization': 'Bearer ' + '@token'
             }
         })
             .then(response => {
