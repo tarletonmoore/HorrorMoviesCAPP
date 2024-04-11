@@ -44,24 +44,32 @@
 <div>
     <h4>Movie</h4>
     <hr />
+    <button class="btn btn-danger" onclick="deleteMovie(@Model.Id)">X</button>
     <h2>@Model.Title</h2>
     <img src="@Model.Image" alt="@Model.Title" width="300px" />
     <h4>Reviews</h4>
     <hr />
-    <ul>
 
-        @foreach (var review in @Model.Reviews)
-        {
-            <li>
-                <span>@review.User.Username: @review.Comment</span>
-                @if (ViewData["UserId"].ToString() == review.UserId.ToString())
-                {
-                    <button class="delete-button" onclick="deleteReview(@review.Id)">X</button>
-                }
-            </li>
-            <br />
-        }
-    </ul>
+    @if (Model.Reviews.Any())
+    {
+        <ul>
+            @foreach (var review in Model.Reviews)
+            {
+                <li>
+                    <span>@review.User.Username: @review.Comment</span>
+                    @if (ViewData["UserId"].ToString() == review.UserId.ToString())
+                    {
+                        <button class="delete-button" onclick="deleteReview(@review.Id)">X</button>
+                    }
+                </li>
+                <br />
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Be the first to leave a review!😬</p>
+    }
 </div>
 <hr />
 <div>
@@ -94,7 +102,6 @@
                             <label for="Image" class="form-label">Image</label>
                             <input type="text" name="Image" class="form-control" id="Image" value="@Model.Image">
                         </div>
-                        <!-- Other form fields (e.g., image input) -->
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -106,6 +113,47 @@
     </div>
 
     <script>
+
+        function deleteMovie(movieId) {
+            event.preventDefault();
+            // Retrieve the JWT token from the URL query parameter
+            var token = getParameterByName('token');
+
+            console.log("TOKEN!!!!", token);
+            console.log("movieId", movieId)
+            // Make a DELETE request to delete the movie
+            fetch(`/Movies/Delete/${movieId}`, {
+                method: 'DELETE',
+                headers:
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+
+
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+
+                }).then(data => {
+                    console.log('Movie deleted successfully:', data);
+                    if (data.success) {
+                        // Redirect to the movies index page
+                        window.location.href = `/Movies?token=${token}`;
+                    } else {
+                        console.error('Error deleting movie:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting movie:', error);
+                });
+
+        }
+
         function saveChanges() {
             // Extract data from the form
             var id = @Model.Id; // Get the movie ID from the model
@@ -165,7 +213,6 @@
                 }).then(data => {
                     console.log('Review deleted successfully:', data);
                     if (data.success) {
-                        // Redirect to the movies index page
                         window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
                     } else {
                         console.error('Error deleting review:', data.message);

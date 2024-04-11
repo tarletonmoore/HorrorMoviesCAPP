@@ -119,6 +119,12 @@ app.MapControllerRoute(
 );
 
 app.MapControllerRoute(
+    name: "movies",
+    pattern: "Movies/Delete/{id}",
+    defaults: new { controller = "Movies", action = "Delete" }
+);
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}"
 );

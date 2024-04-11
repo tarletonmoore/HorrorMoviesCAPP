@@ -221,19 +221,29 @@ namespace MyHorrorMovieApp.Controllers
             return View(movie);
         }
 
-        // POST: Movies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // Delete: Movies/Delete/5
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie != null)
+            try
             {
-                _context.Movies.Remove(movie);
-            }
+                var movie = await _context.Movies.FindAsync(id);
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                if (movie == null)
+                {
+                    return Json(new { success = false, message = "Movie not found" });
+                }
+
+                _context.Movies.Remove(movie);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred while deleting movie:", ex);
+                return StatusCode(500, "An error occurred while deleting the movie.");
+            }
         }
 
         private bool MovieExists(int id)
