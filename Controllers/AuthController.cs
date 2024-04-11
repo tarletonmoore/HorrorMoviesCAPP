@@ -17,16 +17,16 @@ namespace MyHorrorMovieApp.Controllers
       _context = context;
     }
 
-    [HttpGet("login")] // Allow GET requests to /login
+    // [HttpGet("login")]
     public IActionResult Login()
     {
-      // Return the login view
       return View();
     }
 
 
 
-    [HttpPost("login")]
+    // [HttpPost("login")]
+    [HttpPost]
     public IActionResult Login(Login model)
     {
       // Validate the model

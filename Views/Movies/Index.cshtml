@@ -4,193 +4,243 @@
 <html>
 
 <head>
-    <title>Movies Index</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horror Movies</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 
-<body>
-    <nav>
-        <ul style="list-style: none; padding: 0; margin: 0;">
-            <li style="display: inline-block; margin-right: 10px;">
-                <form method="post" action="/logout">
-                    <button type="submit"
-                        style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
-                </form>
-            </li>
-            <li style="display: inline-block;">
-                <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
-                    <button
-                        style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Add
-                        Movie</button>
-                </a>
-            </li>
-        </ul>
-    </nav>
+<div class="container">
+
+    <body>
+        <nav class="mb-4">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li style="display: inline-block; margin-right: 10px;">
+                    <form method="post" action="/logout">
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </li>
+                <li style="display: inline-block;">
+                    <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                        <button class="btn btn-primary">Add
+                            Movie</button>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
 
-    <h1>Movies Index</h1>
-    <!-- Display each movie and its details -->
+        <h1 class="text-center">Movies Index</h1>
+        <!-- Display each movie and its details -->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        function deleteReview(reviewId) {
-            event.preventDefault();
-            // Retrieve the JWT token from the URL query parameter
-            var token = getParameterByName('token');
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            function deleteReview(reviewId) {
+                event.preventDefault();
+                // Retrieve the JWT token from the URL query parameter
+                var token = getParameterByName('token');
 
-            console.log("TOKEN!!!!", token);
-            console.log("reviewId", reviewId)
-            // Make a DELETE request to delete the review
-            fetch(`/Reviews/Delete/${reviewId}`, {
-                method: 'DELETE',
-                headers:
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-
-
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                console.log("TOKEN!!!!", token);
+                console.log("reviewId", reviewId)
+                // Make a DELETE request to delete the review
+                fetch(`/Reviews/Delete/${reviewId}`, {
+                    method: 'DELETE',
+                    headers:
+                    {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
                     }
-                    return response.json();
 
-                    // Optionally handle response here
-                }).then(data => {
-                    console.log('Review deleted successfully:', data);
-                    if (data.success) {
-                        // Redirect to the movies index page
-                        window.location.href = `/Movies?token=${token}`;
-                    } else {
-                        console.error('Error deleting review:', data.message);
-                    }
+
                 })
-                .catch(error => {
-                    console.error('Error deleting review:', error);
-                    // Optionally handle error here
-                });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
 
-        }
+                        // Optionally handle response here
+                    }).then(data => {
+                        console.log('Review deleted successfully:', data);
+                        if (data.success) {
+                            // Redirect to the movies index page
+                            window.location.href = `/Movies?token=${token}`;
+                        } else {
+                            console.error('Error deleting review:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting review:', error);
+                        // Optionally handle error here
+                    });
 
-
-        function submitReview(movieId) {
-            // Retrieve the JWT token from the URL query parameter
-            var token = getParameterByName('token');
-            console.log(token);
-            // Check if token exists
-            if (!token) {
-                console.error('JWT token not found in URL.');
-                return;
             }
 
-            // Split the token into its components (header, payload, signature)
-            const [header, payload, signature] = token.split('.');
 
-            // Decode and parse the payload to get user ID
-            const decodedPayload = JSON.parse(atob(payload));
-            console.log('Decoded Payload:', decodedPayload);
-
-            // Now you have the user ID, you can use it as needed
-
-            var formData = $('#reviewForm_' + movieId).serialize();
-            console.log("FORMDATA", formData);
-            fetch('/Reviews/Create', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer ' + token // Include token in Authorization header
+            function submitReview(movieId) {
+                // Retrieve the JWT token from the URL query parameter
+                var token = getParameterByName('token');
+                console.log(token);
+                // Check if token exists
+                if (!token) {
+                    console.error('JWT token not found in URL.');
+                    return;
                 }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
+
+                // Split the token into its components (header, payload, signature)
+                const [header, payload, signature] = token.split('.');
+
+                // Decode and parse the payload to get user ID
+                const decodedPayload = JSON.parse(atob(payload));
+                console.log('Decoded Payload:', decodedPayload);
+
+                // Now you have the user ID, you can use it as needed
+
+                var formData = $('#reviewForm_' + movieId).serialize();
+                console.log("FORMDATA", formData);
+                fetch('/Reviews/Create', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Bearer ' + token // Include token in Authorization header
                     }
-                    return response.json();
                 })
-                .then(data => {
-                    console.log('Review created successfully:', data);
-                    if (data.success) {
-                        // Redirect to the movies index page
-                        window.location.href = `/Movies?token=${token}`;
-                    } else {
-                        console.error('Error creating review:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error creating review:', error);
-                    // Optionally handle error here
-                });
-        }
-
-        // Function to retrieve query parameter value by name
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-    </script>
-
-
-    @foreach (var movie in Model)
-    {
-        <div class="movie-card">
-            <h2>@movie.Title</h2>
-            <img src="@movie.Image" alt="@movie.Title" width="300px" />
-            <br />
-            <a href="/Movies/Details/@movie.Id?token=@ViewData["Token"]" style="text-decoration: none;">
-                <button
-                    style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Movie
-                    Details</button>
-            </a>
-            <h3>Reviews</h3>
-            <ul>
-
-                @foreach (var review in movie.Reviews)
-                {
-                    <li>
-                        <span>@review.User.Username: @review.Comment</span>
-                        @if (ViewData["UserId"].ToString() == review.UserId.ToString())
-                        {
-                            <button class="delete-button" onclick="deleteReview(@review.Id)">X</button>
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
-                    </li>
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Review created successfully:', data);
+                        if (data.success) {
+                            // Redirect to the movies index page
+                            window.location.href = `/Movies?token=${token}`;
+                        } else {
+                            console.error('Error creating review:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error creating review:', error);
+                        // Optionally handle error here
+                    });
+            }
+
+            // Function to retrieve query parameter value by name
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+        </script>
+
+        <div class="row">
+            @foreach (var movie in Model)
+            {
+                <div class="col-md-6">
+                    <div class="card movie-card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                @* <div class="col-auto">
+                            <button class="btn btn-danger" onclick="deleteMovie(@movie.Id)">X</button>
+                            </div> *@
+                                <div class="col text-center">
+                                    <h4 class="m-0">@movie.Title</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="image-container" style="height: 400px; overflow: hidden;">
+                                <img src="@movie.Image" class="card-img-top img-fluid" alt="@movie.Title"
+                                    style="object-fit: contain; width: 100%; height: 100%;" />
+                            </div>
+                            <br />
+                            <div>
+                                <a href="/Movies/Details/@movie.Id?token=@ViewData["Token"]" class="btn btn-primary">Movie
+                                    Details</a>
+                            </div>
+                            <h6 class="card-subtitle mt-3 mb-2" style="border-top: 2px solid white;">Reviews:</h6>
+
+                            <ul class="list-group list-group-flush">
+                                @foreach (var review in movie.Reviews)
+                                {
+                                    <li class="list-group-item">
+                                        <span>@review.User.Username: @review.Comment</span>
+                                        @if (ViewData["UserId"].ToString() == review.UserId.ToString())
+                                        {
+                                            <button class="btn btn-danger btn-sm float-end"
+                                                onclick="deleteReview(@review.Id)">X</button>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                            <form id="reviewForm_@movie.Id" class="d-flex align-items-center mt-3">
+                                <input type="hidden" name="MovieId" value="@movie.Id" />
+                                <input type="text" name="Comment" class="form-control flex-grow-1 me-2"
+                                    style="max-width: 400px;" />
+                                <button class="btn btn-primary" type="button" onclick="submitReview(@movie.Id)">Add
+                                    Review</button>
+                            </form>
+
+                        </div>
+                    </div>
                     <br />
-                }
-            </ul>
+                </div>
 
-            <form id="reviewForm_@movie.Id">
-                <input type="hidden" name="MovieId" value="@movie.Id" />
-                <input type="text" name="Comment" />
-                <button type="button" onclick="submitReview(@movie.Id)">Add Review</button>
-            </form>
-            <br></br>
+            }
+
         </div>
-    }
 
 
 
 
-</body>
+
+    </body>
+
+</div>
 
 </html>
 
 <style>
-    .delete-button {
-        background-color: lightgray;
-        border: 1px solid #ccc;
-        color: #cc0000;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        margin-left: 5px;
+    .card {
+        background-color: #4d0000;
+        color: #fff;
+        margin-left: 10px;
+    }
+
+    nav.mb-4 {
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    .card-header {
+        border-color: #fff;
+    }
+
+    .container {
+        background-color: #121212;
+        color: #fff;
+        width: 100%;
+    }
+
+    body {
+        background-color: #121212;
     }
 </style>

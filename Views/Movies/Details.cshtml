@@ -23,228 +23,262 @@
 
 </head>
 
-<nav>
-    <ul style="list-style: none; padding: 0; margin: 0;">
-        <li style="display: inline-block; margin-right: 10px;">
-            <form method="post" action="/logout">
-                <button type="submit" class="btn btn-primary">Logout</button>
-            </form>
-        </li>
-        <li style="display: inline-block;">
-            <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
-                <button class="btn btn-primary">Add
-                    Movie</button>
-            </a>
-        </li>
-    </ul>
-</nav>
-
-<h1>Details</h1>
-
-<div>
-    <h4>Movie</h4>
-    <hr />
-    <button class="btn btn-danger" onclick="deleteMovie(@Model.Id)">X</button>
-    <h2>@Model.Title</h2>
-    <img src="@Model.Image" alt="@Model.Title" width="300px" />
-    <h4>Reviews</h4>
-    <hr />
-
-    @if (Model.Reviews.Any())
-    {
-        <ul>
-            @foreach (var review in Model.Reviews)
-            {
-                <li>
-                    <span>@review.User.Username: @review.Comment</span>
-                    @if (ViewData["UserId"].ToString() == review.UserId.ToString())
-                    {
-                        <button class="delete-button" onclick="deleteReview(@review.Id)">X</button>
-                    }
-                </li>
-                <br />
-            }
+<div class="custom-container">
+    <nav class="mb-4 nav">
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="display: inline-block; margin-right: 10px;">
+                <form method="post" action="/logout">
+                    <button type="submit" class="btn btn-primary">Logout</button>
+                </form>
+            </li>
+            <li style="display: inline-block;">
+                <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                    <button class="btn btn-primary">Add Movie</button>
+                </a>
+            </li>
         </ul>
-    }
-    else
-    {
-        <p>Be the first to leave a review!😬</p>
-    }
-</div>
-<hr />
-<div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
-        Edit
-    </button> |
-    <a href="/Movies?token=@ViewData["Token"]" style="text-decoration: none;">
-        <button class="btn btn-primary">Back
-            to Movies</button>
-    </a>
-</div>
-<div>
+    </nav>
 
-    <!-- Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Movie</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Edit Form -->
-                    <form id="editForm">
-                        <div class="mb-3">
-                            <label for="Title" class="form-label">Title</label>
-                            <input type="text" name="Title" class="form-control" id="Title" value="@Model.Title">
+    <h1 class="details">Details</h1>
+    <br />
+    <div class="row"> <!-- Center the column justify-content-center -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <button class="btn btn-danger" onclick="deleteMovie(@Model.Id)">X</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="Image" class="form-label">Image</label>
-                            <input type="text" name="Image" class="form-control" id="Image" value="@Model.Image">
+                        <div class="col text-center">
+                            <h4 class="m-0">Movie</h4>
                         </div>
-                    </form>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveChanges()">Save changes</button>
+                <div class="card-body">
+
+                    <h2>@Model.Title</h2>
+                    <br />
+                    <img src="@Model.Image" alt="@Model.Title" width="300px" />
+                    <br />
+                    <br />
+                    <h4>Reviews</h4>
+                    <hr />
+                    @if (Model.Reviews.Any())
+                    {
+                        <ul>
+                            @foreach (var review in Model.Reviews)
+                            {
+                                <li>
+                                    <span>@review.User.Username: @review.Comment</span>
+                                    @if (ViewData["UserId"].ToString() == review.UserId.ToString())
+                                    {
+                                        <button class="btn btn-danger" onclick="deleteReview(@review.Id)">X</button>
+                                    }
+                                </li>
+                                <br />
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Be the first to leave a review!😬</p>
+                    }
+                    <hr />
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editModal">
+                            Edit
+                        </button> |
+                        <a href="/Movies?token=@ViewData["Token"]" style="text-decoration: none;">
+                            <button class="btn btn-primary">Back
+                                to Movies</button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
+        <div>
 
-        function deleteMovie(movieId) {
-            event.preventDefault();
-            // Retrieve the JWT token from the URL query parameter
-            var token = getParameterByName('token');
+            <!-- Modal -->
+            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel" style="color: black;">Edit Movie</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Edit Form -->
+                            <form id="editForm">
+                                <div class="mb-3">
+                                    <label for="Title" class="form-label" style="color: black;">Title</label>
+                                    <input type="text" name="Title" class="form-control" id="Title"
+                                        value="@Model.Title">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Image" class="form-label" style="color: black;">Image</label>
+                                    <input type="text" name="Image" class="form-control" id="Image"
+                                        value="@Model.Image">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="saveChanges()">Save
+                                changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            console.log("TOKEN!!!!", token);
-            console.log("movieId", movieId)
-            // Make a DELETE request to delete the movie
-            fetch(`/Movies/Delete/${movieId}`, {
-                method: 'DELETE',
-                headers:
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
+            <script>
+
+                function deleteMovie(movieId) {
+                    event.preventDefault();
+                    // Retrieve the JWT token from the URL query parameter
+                    var token = getParameterByName('token');
+
+                    console.log("TOKEN!!!!", token);
+                    console.log("movieId", movieId)
+                    // Make a DELETE request to delete the movie
+                    fetch(`/Movies/Delete/${movieId}`, {
+                        method: 'DELETE',
+                        headers:
+                        {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+
+
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+
+                        }).then(data => {
+                            console.log('Movie deleted successfully:', data);
+                            if (data.success) {
+                                // Redirect to the movies index page
+                                window.location.href = `/Movies?token=${token}`;
+                            } else {
+                                console.error('Error deleting movie:', data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting movie:', error);
+                        });
+
+                }
+
+                function saveChanges() {
+                    // Extract data from the form
+                    var id = @Model.Id; // Get the movie ID from the model
+                    var title = document.getElementById('Title').value;
+                    var image = document.getElementById('Image').value;
+                    var token = getParameterByName('token');
+
+                    // Send AJAX request to update movie details
+                    $.ajax({
+                        type: 'POST',
+                        url: `/Movies/Edit/${id}`,
+                        data: {
+                            Id: id,
+                            Title: title,
+                            Image: image
+                        },
+                        success: function (response) {
+                            window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            console.error('Error updating movie:', error);
+                        }
+                    });
+
+                    // Close the modal
+                    $('#editModal').modal('hide');
                 }
 
 
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
 
-                }).then(data => {
-                    console.log('Movie deleted successfully:', data);
-                    if (data.success) {
-                        // Redirect to the movies index page
-                        window.location.href = `/Movies?token=${token}`;
-                    } else {
-                        console.error('Error deleting movie:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting movie:', error);
-                });
+                function deleteReview(reviewId) {
+                    event.preventDefault();
+                    // Retrieve the JWT token from the URL query parameter
+                    var token = getParameterByName('token');
 
-        }
-
-        function saveChanges() {
-            // Extract data from the form
-            var id = @Model.Id; // Get the movie ID from the model
-            var title = document.getElementById('Title').value;
-            var image = document.getElementById('Image').value;
-            var token = getParameterByName('token');
-
-            // Send AJAX request to update movie details
-            $.ajax({
-                type: 'POST',
-                url: `/Movies/Edit/${id}`,
-                data: {
-                    Id: id,
-                    Title: title,
-                    Image: image
-                },
-                success: function (response) {
-                    window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
-                },
-                error: function (xhr, status, error) {
-                    // Handle error
-                    console.error('Error updating movie:', error);
-                }
-            });
-
-            // Close the modal
-            $('#editModal').modal('hide');
-        }
+                    console.log("TOKEN!!!!", token);
+                    console.log("reviewId", reviewId)
+                    // Make a DELETE request to delete the review
+                    fetch(`/Reviews/Delete/${reviewId}`, {
+                        method: 'DELETE',
+                        headers:
+                        {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
 
 
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
 
-        function deleteReview(reviewId) {
-            event.preventDefault();
-            // Retrieve the JWT token from the URL query parameter
-            var token = getParameterByName('token');
+                        }).then(data => {
+                            console.log('Review deleted successfully:', data);
+                            if (data.success) {
+                                window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
+                            } else {
+                                console.error('Error deleting review:', data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting review:', error);
+                        });
 
-            console.log("TOKEN!!!!", token);
-            console.log("reviewId", reviewId)
-            // Make a DELETE request to delete the review
-            fetch(`/Reviews/Delete/${reviewId}`, {
-                method: 'DELETE',
-                headers:
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
                 }
 
+                function getParameterByName(name, url) {
+                    if (!url) url = window.location.href;
+                    name = name.replace(/[\[\]]/g, '\\$&');
+                    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                        results = regex.exec(url);
+                    if (!results) return null;
+                    if (!results[2]) return '';
+                    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+                }
+            </script>
+        </div>
 
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
+        <style>
+            .custom-container {
+                padding-left: 5px;
+                background-color: #121212;
+                color: #fff;
+            }
 
-                }).then(data => {
-                    console.log('Review deleted successfully:', data);
-                    if (data.success) {
-                        window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
-                    } else {
-                        console.error('Error deleting review:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting review:', error);
-                });
+            .card {
+                background-color: #4d0000;
+                color: #fff;
+                margin-left: 10px;
+            }
 
-        }
+            nav.mb-4.nav {
+                padding-left: 10px;
+                padding-top: 10px;
+            }
 
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-    </script>
-</div>
+            .details {
+                margin-left: 500px;
+            }
 
-<style>
-    .delete-button {
-        background-color: lightgray;
-        border: 1px solid #ccc;
-        color: #cc0000;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        margin-left: 5px;
-    }
-</style>
+            .card-header {
+                border-color: #fff;
+            }
+        </style>

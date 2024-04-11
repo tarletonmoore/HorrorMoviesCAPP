@@ -89,6 +89,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "default",
+    pattern: "",
+    defaults: new { controller = "Auth", action = "Login" }
+);
+
+app.MapControllerRoute(
     name: "login",
     pattern: "login",
     defaults: new { controller = "Auth", action = "Login" }
@@ -124,10 +130,7 @@ app.MapControllerRoute(
     defaults: new { controller = "Movies", action = "Delete" }
 );
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Auth}/{action=Login}"
-);
+
 
 app.MapControllerRoute(
     name: "reviews",
