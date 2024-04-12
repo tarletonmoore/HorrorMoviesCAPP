@@ -19,7 +19,8 @@
 
 <div class="container">
   <div class="row justify-content-center">
-    <div class="col-md-8"> <!-- Adjust the column size as needed -->
+    <div class="col-md-8">
+      <h1 class="text-center" style="color: #fff;">Login</h1>
       <div class="card border border-light">
         <div class="card-body">
           <form method="post" action="/login">
@@ -27,6 +28,11 @@
             <input type="password" id="password" name="Password" asp-for="Password" placeholder="Password" />
             <button class="btn btn-primary" type="submit">Login</button>
           </form>
+          <br />
+          <h4>Don't have an account?</h4>
+          <a href="/Users/Create" style="text-decoration: none;">
+            <button class="btn btn-primary">Signup</button>
+          </a>
         </div>
       </div>
     </div>

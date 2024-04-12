@@ -101,6 +101,12 @@ app.MapControllerRoute(
 );
 
 app.MapControllerRoute(
+    name: "users",
+    pattern: "Users/Create",
+    defaults: new { controller = "Users", action = "Create" }
+);
+
+app.MapControllerRoute(
     name: "movies",
     pattern: "Movies",
     defaults: new { controller = "Movies", action = "Index" }

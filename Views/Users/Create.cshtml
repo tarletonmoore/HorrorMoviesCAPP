@@ -4,32 +4,95 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
 
-<h4>User</h4>
-<hr />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<nav>
+    <a href="/login" style="text-decoration: none;">
+        <button class="btn btn-primary">Login</button>
+    </a>
+</nav>
+
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Username" class="control-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
+    <div class="col-md-8">
+        <h1 class="text-center">Signup</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <div id="passwordMismatchAlert" class="alert alert-danger d-none" role="alert">
+                    Password and confirmation do not match.
+                </div>
+
+                <form method="post" action="/Users/Create" id="registrationForm">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="Username" asp-for="Username" class="form-control"
+                            placeholder="Username" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="Password" asp-for="Password" class="form-control"
+                            placeholder="Password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password:</label>
+                        <input type="password" id="confirmPassword" class="form-control"
+                            placeholder="Confirm Password" />
+                    </div>
+                    <br />
+                    <button class="btn btn-primary" type="submit">Create Account</button>
+                </form>
+
+
             </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
+<script>
+    $(document).ready(function () {
+        $('#registrationForm').submit(function (event) {
+            var password = $('#password').val();
+            var confirmPassword = $('#confirmPassword').val();
+            if (password !== confirmPassword) {
+                // Display alert with red color (danger)
+                $('#passwordMismatchAlert').removeClass('d-none'); // Show the alert
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+    });
+</script>
+
+
+
+<style>
+    nav {
+        margin-left: 10px;
+        padding-top: 5px;
+    }
+
+    body {
+        background-color: #121212;
+        color: #fff;
+    }
+
+    .card {
+        background-color: #4d0000;
+        margin-left: 10px;
+    }
+</style>
