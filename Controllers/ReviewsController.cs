@@ -61,7 +61,22 @@ namespace MyHorrorMovieApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Review review)
         {
-            Console.WriteLine("Received POST request to /Review/Create");
+            // Validate the review model
+            // if (!ModelState.IsValid)
+            // {
+            //     // Get the validation errors
+            //     var errors = ModelState.Values.SelectMany(v => v.Errors)
+            //                                   .Select(e => e.ErrorMessage);
+
+            //     // Return a JSON response with the validation errors
+            //     return Json(new { success = false, errors = errors });
+            // }
+
+            if (review.Comment.Length < 3)
+            {
+                // Return a JSON response with an error message
+                return Json(new { success = false, errors = new[] { "Review must be at least 3 characters long" } });
+            }
 
             // Extract userId from the JWT token payload
             var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -103,7 +118,6 @@ namespace MyHorrorMovieApp.Controllers
             // Return a JSON response indicating success
             return Json(new { success = true });
         }
-
 
 
         // GET: Reviews/Edit/5

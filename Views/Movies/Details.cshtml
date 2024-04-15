@@ -41,7 +41,7 @@
 
     <h1 class="details">Details</h1>
     <br />
-    <div class="row"> <!-- Center the column justify-content-center -->
+    <div class="row">
         <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-header">
@@ -62,6 +62,10 @@
                     <br />
                     <br />
                     <h4>Reviews</h4>
+
+                    <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+                    </div>
+
 
                     <form id="reviewForm_@Model.Id" class="d-flex align-items-center mt-3">
                         <input type="hidden" name="MovieId" value="@Model.Id" />
@@ -145,7 +149,7 @@
                 function submitReview(movieId) {
                     // Retrieve the JWT token from the URL query parameter
                     var token = getParameterByName('token');
-                    console.log(token);
+
                     // Check if token exists
                     if (!token) {
                         console.error('JWT token not found in URL.');
@@ -159,10 +163,9 @@
                     const decodedPayload = JSON.parse(atob(payload));
                     console.log('Decoded Payload:', decodedPayload);
 
-                    // Now you have the user ID, you can use it as needed
-
                     var formData = $('#reviewForm_' + movieId).serialize();
                     console.log("FORMDATA", formData);
+
                     fetch('/Reviews/Create', {
                         method: 'POST',
                         body: formData,
@@ -184,13 +187,27 @@
                                 // Redirect to the movies index page
                                 window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
                             } else {
+                                // Show error message
                                 console.error('Error creating review:', data.message);
+                                displayErrorMessage(data.errors);
                             }
                         })
                         .catch(error => {
                             console.error('Error creating review:', error);
                             // Optionally handle error here
+                            displayErrorMessage(error.message);
                         });
+                }
+
+                function displayErrorMessage(message) {
+                    // Get the error message element
+                    var errorMessageElement = document.getElementById('errorMessage');
+                    // display all model invalid errors: errorMessageElement.textContent = message;
+
+                    errorMessageElement.textContent = 'Review must be at least 3 characters long';
+
+                    // Show the error message element
+                    errorMessageElement.classList.remove('d-none');
                 }
 
                 function deleteMovie(movieId) {
