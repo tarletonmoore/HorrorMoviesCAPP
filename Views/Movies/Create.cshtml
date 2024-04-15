@@ -23,7 +23,6 @@
 
 </head>
 
-@* <div class="container"> *@
 
 <nav>
     <ul style="list-style: none; padding: 0; margin: 0;">
@@ -46,6 +45,10 @@
 
         <div class="card">
             <div class="card-body">
+                <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+                    <ul id="errorList"></ul>
+                </div>
+
                 <form id="createMovieForm" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group" style="padding-left: 12px;">
@@ -73,7 +76,6 @@
     </div>
 </div>
 
-@* </div> *@
 
 <script>
     document.getElementById('createMovieForm').addEventListener('submit', function (event) {
@@ -101,7 +103,8 @@
                     // Redirect to the movies index page
                     window.location.href = `/Movies?token=@token`;
                 } else {
-                    console.error('Error creating movie:', data.message);
+                    console.error('Error creating movie:', data.errors);
+                    displayErrorMessage(data.errors);
                 }
             })
             .catch(error => {
@@ -109,6 +112,26 @@
                 // Optionally handle error here
             });
     });
+
+    function displayErrorMessage(errors) {
+        // Get the error message element
+        var errorListElement = document.getElementById('errorList');
+
+        // Clear any existing error messages
+        errorListElement.innerHTML = '';
+
+        // Iterate over the errors array and create list items for each error message
+        errors.forEach(function (error) {
+            var listItem = document.createElement('li');
+            listItem.textContent = error;
+            errorListElement.appendChild(listItem);
+        });
+
+        // Show the error message element
+        var errorMessageElement = document.getElementById('errorMessage');
+        errorMessageElement.classList.remove('d-none');
+    }
+
 </script>
 
 <style>

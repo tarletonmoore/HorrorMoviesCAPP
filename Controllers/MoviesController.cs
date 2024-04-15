@@ -122,7 +122,11 @@ namespace MyHorrorMovieApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState); // Return validation errors if model state is invalid
+
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                             .Select(e => e.ErrorMessage);
+
+                return Json(new { success = false, errors = errors });
             }
 
             try
