@@ -32,16 +32,16 @@ namespace MyHorrorMovieApp.Controllers
       // Validate the model
       if (!ModelState.IsValid)
       {
-        // Model validation failed, return the view with validation errors
-        return View(model);
+        // Model validation failed, return error JSON
+        return Json(new { success = false, errorMessage = "Invalid username or password" });
       }
 
       // Validate the user credentials and retrieve the user ID
       var user = _context.Users.SingleOrDefault(u => u.Username == model.Username && u.Password == model.Password);
       if (user == null)
       {
-        ModelState.AddModelError("", "Invalid username or password");
-        return View(model);
+        // User not found, return error JSON
+        return Json(new { success = false, errorMessage = "Invalid username or password" });
       }
 
       // Generate a JWT token with the user ID
@@ -55,9 +55,10 @@ namespace MyHorrorMovieApp.Controllers
         SameSite = SameSiteMode.Lax // Adjust as needed
       });
 
-      // Redirect to the "Index" action method of the "Movies" controller after successful login
-      return RedirectToAction("Index", "Movies", new { token });
+      // Return success JSON
+      return Json(new { success = true, token = token });
     }
+
 
 
     // [HttpPost("register")]

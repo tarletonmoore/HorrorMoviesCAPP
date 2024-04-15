@@ -23,7 +23,11 @@
       <h1 class="text-center" style="color: #fff;">Login</h1>
       <div class="card border border-light">
         <div class="card-body">
-          <form method="post" action="/login">
+
+          <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+          </div>
+
+          <form method="post" action="/login" id="loginForm">
             <input type="text" id="username" name="Username" asp-for="Username" placeholder="Username" />
             <input type="password" id="password" name="Password" asp-for="Password" placeholder="Password" />
             <button class="btn btn-primary" type="submit">Login</button>
@@ -38,6 +42,41 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(document).ready(function () {
+    $('#loginForm').submit(function (event) {
+      event.preventDefault(); // Prevent form submission
+
+      var username = $('#username').val();
+      var password = $('#password').val();
+
+      // AJAX request to validate username and password
+      $.ajax({
+        url: '/login',
+        method: 'POST',
+        data: { Username: username, Password: password },
+        success: function (response) {
+          // Check if the response indicates successful login
+          if (response.success) {
+            // Redirect or perform actions for successful login
+            window.location.href = '/Movies?token=' + response.token;
+          } else {
+            // Show error message
+            $('#errorMessage').removeClass('d-none').addClass('show');
+            $('#errorMessage').text(response.errorMessage);
+          }
+        },
+        error: function () {
+          // Handle error, such as server not responding
+          console.error('An error occurred during login.');
+        }
+      });
+    });
+  });
+
+</script>
+
 
 <style>
   .container {
