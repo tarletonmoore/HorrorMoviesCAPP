@@ -43,7 +43,7 @@
     <br />
     <div class="row">
         <div class="col-md-8">
-            <div class="card mb-4">
+            <div class="card mb-4 border border-light">
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -115,21 +115,22 @@
             <!-- Modal -->
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="modal-content border border-light">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editModalLabel" style="color: black;">Edit Movie</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="editModalLabel" style="color: #fff;">Edit Movie</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                style="background-color: #fff;"></button>
                         </div>
                         <div class="modal-body">
                             <!-- Edit Form -->
                             <form id="editForm">
                                 <div class="mb-3">
-                                    <label for="Title" class="form-label" style="color: black;">Title</label>
+                                    <label for="Title" class="form-label" style="color: #fff;">Title</label>
                                     <input type="text" name="Title" class="form-control" id="Title"
                                         value="@Model.Title">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="Image" class="form-label" style="color: black;">Image</label>
+                                    <label for="Image" class="form-label" style="color: #fff;">Image</label>
                                     <input type="text" name="Image" class="form-control" id="Image"
                                         value="@Model.Image">
                                 </div>
@@ -355,5 +356,10 @@
 
             .card-header {
                 border-color: #fff;
+            }
+
+            .modal-content {
+                background-color: #4d0000;
+
             }
         </style>
