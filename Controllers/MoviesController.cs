@@ -118,7 +118,7 @@ namespace MyHorrorMovieApp.Controllers
 
         // POST: Movies/Create
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("Title,Image")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Title,Image,Year,Plot")] Movie movie)
         {
             if (!ModelState.IsValid)
             {
