@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Title</title>
+    <title>@Model.Title</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -59,6 +59,13 @@
                     <h2>@Model.Title</h2>
                     <br />
                     <img src="@Model.Image" alt="@Model.Title" width="300px" />
+                    <br />
+                    <br />
+                    <hr />
+                    <h4>Year: @Model.Year</h4>
+                    <hr />
+                    <h3>Plot: @Model.Plot</h3>
+                    <hr />
                     <br />
                     <br />
                     <h4>Reviews</h4>
@@ -133,6 +140,14 @@
                                     <label for="Image" class="form-label" style="color: #fff;">Image</label>
                                     <input type="text" name="Image" class="form-control" id="Image"
                                         value="@Model.Image">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Year" class="form-label" style="color: #fff;">Year</label>
+                                    <input type="number" name="Year" class="form-control" id="Year" value="@Model.Year">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Plot" class="form-label" style="color: #fff;">Plot</label>
+                                    <input type="text" name="Plot" class="form-control" id="Plot" value="@Model.Plot">
                                 </div>
                             </form>
                         </div>
@@ -255,6 +270,9 @@
                     var id = @Model.Id; // Get the movie ID from the model
                     var title = document.getElementById('Title').value;
                     var image = document.getElementById('Image').value;
+                    var year = document.getElementById('Year').value;
+                    var plot = document.getElementById('Plot').value;
+
                     var token = getParameterByName('token');
 
                     // Send AJAX request to update movie details
@@ -264,7 +282,9 @@
                         data: {
                             Id: id,
                             Title: title,
-                            Image: image
+                            Image: image,
+                            Year: year,
+                            Plot: plot
                         },
                         success: function (response) {
                             window.location.href = `/Movies/Details/@Model.Id?token=${token}`;

@@ -14,6 +14,10 @@ namespace MyHorrorMovieApp.Models
     [Required]
     public string Image { get; set; } = "";
 
+    public int Year { get; set; }
+
+    public string Plot { get; set; }
+
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
   }

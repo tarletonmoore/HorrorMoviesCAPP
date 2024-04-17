@@ -34,9 +34,10 @@ namespace MyHorrorMovieApp.Models
       );
 
       modelBuilder.Entity<Movie>().HasData(
-          new Movie { Id = 1, Title = "Texas Chainsaw Massacre", Image = "https://m.media-amazon.com/images/M/MV5BMTU1MzY2NDc2MV5BMl5BanBnXkFtZTgwMTc3MTUzMzI@._V1_.jpg" },
-          new Movie { Id = 2, Title = "The Descent", Image = "https://m.media-amazon.com/images/M/MV5BMjA5NzQ1NTgwNV5BMl5BanBnXkFtZTcwNjUxMzUzMw@@._V1_FMjpg_UX1000_.jpg" }
-      );
+               new Movie { Id = 1, Title = "Texas Chainsaw Massacre", Image = "https://m.media-amazon.com/images/M/MV5BMTU1MzY2NDc2MV5BMl5BanBnXkFtZTgwMTc3MTUzMzI@._V1_.jpg", Plot = "Default plot for Texas Chainsaw Massacre" },
+               new Movie { Id = 2, Title = "The Descent", Image = "https://m.media-amazon.com/images/M/MV5BMjA5NzQ1NTgwNV5BMl5BanBnXkFtZTcwNjUxMzUzMw@@._V1_FMjpg_UX1000_.jpg", Plot = "Default plot for The Descent" }
+           );
+
 
       modelBuilder.Entity<Review>().HasData(
           new Review { Id = 1, UserId = 1, MovieId = 1, Comment = "Classic slasher movie!!!" },

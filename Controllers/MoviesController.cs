@@ -166,16 +166,19 @@ namespace MyHorrorMovieApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image,Year,Plot")] Movie movie)
         {
             string token = HttpContext.Request.Query["token"];
 
             // Pass the token to the Create view
             ViewData["Token"] = token;
-            System.Console.WriteLine("TOKEN!!!: {0}", token);
-            System.Console.WriteLine("ID!!!: {0}", id);
-            System.Console.WriteLine("Title!!!: {0}", movie.Title);
-            System.Console.WriteLine("Image!!!: {0}", movie.Image);
+            // System.Console.WriteLine("TOKEN!!!: {0}", token);
+            // System.Console.WriteLine("ID!!!: {0}", id);
+            // System.Console.WriteLine("Title!!!: {0}", movie.Title);
+            // System.Console.WriteLine("Image!!!: {0}", movie.Image);
+            // System.Console.WriteLine("Year!!!: {0}", movie.Year);
+            // System.Console.WriteLine("Plot!!!: {0}", movie.Plot);
+
 
 
             if (id != movie.Id)
