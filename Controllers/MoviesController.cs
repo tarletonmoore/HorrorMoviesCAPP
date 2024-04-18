@@ -45,7 +45,6 @@ namespace MyHorrorMovieApp.Controllers
                 // Set the user ID in ViewData to make it available in the view
                 ViewData["UserId"] = userId;
                 ViewData["Token"] = token;
-
                 Console.WriteLine("Index Token!!!!!!!!!: {0}", token);
 
                 // Retrieve movies with reviews and users asynchronously
@@ -86,6 +85,19 @@ namespace MyHorrorMovieApp.Controllers
 
             // Retrieve the user ID from the token's payload
             var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
 
             // Set the user ID in ViewData to make it available in the view
             ViewData["UserId"] = userId;

@@ -15,6 +15,8 @@ namespace MyHorrorMovieApp.Models
     [MinLength(5)]
     public string Password { get; set; } = "";
 
+    public bool Admin { get; set; }
+
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
   }
 }
