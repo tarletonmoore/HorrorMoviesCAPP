@@ -31,11 +31,14 @@
                     <button type="submit" class="btn btn-primary">Logout</button>
                 </form>
             </li>
-            <li style="display: inline-block; margin-right: 10px;">
-                <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
-                    <button class="btn btn-primary">Add Movie</button>
-                </a>
-            </li>
+            @if ((bool)ViewData["IsAdmin"])
+            {
+                <li style="display: inline-block; margin-right: 10px;">
+                    <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                        <button class="btn btn-primary">Add Movie</button>
+                    </a>
+                </li>
+            }
             <li style="display: inline-block; margin-right: 10px;">
                 <a href="/Movies?token=@ViewData["Token"]" style="text-decoration: none;">
                     <button class="btn btn-primary">Back
@@ -246,7 +249,7 @@
                     console.log("TOKEN!!!!", token);
                     console.log("movieId", movieId)
                     // Make a DELETE request to delete the movie
-                    fetch(`/Movies/Delete/${movieId}`, {
+                    fetch(`/Movies/Delete/${movieId}?token=${token}`, {
                         method: 'DELETE',
                         headers:
                         {
@@ -291,13 +294,14 @@
                     // Send AJAX request to update movie details
                     $.ajax({
                         type: 'POST',
-                        url: `/Movies/Edit/${id}`,
+                        url: `/Movies/Edit/${id}?token=${token}`,
                         data: {
                             Id: id,
                             Title: title,
                             Image: image,
                             Year: year,
-                            Plot: plot
+                            Plot: plot,
+                            token: token
                         },
                         success: function (response) {
                             window.location.href = `/Movies/Details/@Model.Id?token=${token}`;

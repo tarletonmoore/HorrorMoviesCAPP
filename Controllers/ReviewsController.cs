@@ -201,11 +201,40 @@ namespace MyHorrorMovieApp.Controllers
         {
             try
             {
+                // Retrieve token from cookies
+                var token = Request.Cookies["token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(); // Return 401 Unauthorized if token is missing
+                }
+
+                // Validate and decode the token
+                var handler = new JwtSecurityTokenHandler();
+                var decodedToken = handler.ReadJwtToken(token);
+
+                // Retrieve the user ID from the token's payload
+                var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+                // Convert userId to integer
+                if (!int.TryParse(userId, out int userIdInt))
+                {
+                    // Handle invalid userId here, such as returning an error response
+                    return BadRequest("Invalid userId format.");
+                }
+
+                // Query the database to retrieve the review based on the review ID and user ID
                 var review = await _context.Reviews.FindAsync(id);
 
                 if (review == null)
                 {
                     return Json(new { success = false, message = "Review not found" });
+                }
+
+                // Check if the review belongs to the user (optional)
+                if (review.UserId != userIdInt)
+                {
+                    return StatusCode(403, new { message = "Not permitted to delete review" });
                 }
 
                 _context.Reviews.Remove(review);
@@ -219,7 +248,6 @@ namespace MyHorrorMovieApp.Controllers
                 return StatusCode(500, "An error occurred while deleting the review.");
             }
         }
-
 
 
 

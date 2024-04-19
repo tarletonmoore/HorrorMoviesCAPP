@@ -36,6 +36,8 @@
                 <div id="passwordMismatchAlert" class="alert alert-danger d-none" role="alert">
                     Password and confirmation do not match.
                 </div>
+                <div id="modelStateErrors" class="alert alert-danger d-none" role="alert">
+                </div>
 
                 <form method="post" action="/Users/Create" id="registrationForm">
                     <div class="form-group">
@@ -64,20 +66,69 @@
 </div>
 
 
+@* <script>
+
+
+$(document).ready(function () {
+$('#registrationForm').submit(function (event) {
+var password = $('#password').val();
+var confirmPassword = $('#confirmPassword').val();
+if (password !== confirmPassword) {
+// Display alert with red color (danger)
+$('#passwordMismatchAlert').removeClass('d-none'); // Show the alert
+event.preventDefault(); // Prevent form submission
+}
+});
+});
+</script> *@
+
 <script>
     $(document).ready(function () {
         $('#registrationForm').submit(function (event) {
             var password = $('#password').val();
             var confirmPassword = $('#confirmPassword').val();
             if (password !== confirmPassword) {
-                // Display alert with red color (danger)
-                $('#passwordMismatchAlert').removeClass('d-none'); // Show the alert
+                $('#passwordMismatchAlert').removeClass('d-none'); // Show password mismatch alert
                 event.preventDefault(); // Prevent form submission
+                return; // Exit function to prevent further processing
             }
+
+            // If passwords match, hide password mismatch alert
+            $('#passwordMismatchAlert').addClass('d-none');
+
+            // Clear any existing model state errors
+            $('#modelStateErrors').html('');
+
+            // Send AJAX request to submit form data
+            $.ajax({
+                type: 'POST',
+                url: '/Users/Create',
+                data: $('#registrationForm').serialize(), // Serialize form data
+                success: function (response) {
+                    if (!response.success) {
+                        // Display model state errors
+                        var errorsHtml = '';
+                        response.errors.forEach(function (error) {
+                            errorsHtml += '<li>' + error + '</li>';
+                        });
+                        $('#modelStateErrors').html(errorsHtml);
+                        $('#modelStateErrors').removeClass('d-none'); // Show model state errors
+                    } else {
+                        // Redirect to login page on successful registration
+                        window.location.href = '/Auth/Login';
+                    }
+                },
+                error: function () {
+                    // Handle error if AJAX request fails
+                    console.error('Error submitting registration form.');
+                }
+            });
+
+            // Prevent default form submission
+            event.preventDefault();
         });
     });
 </script>
-
 
 
 <style>

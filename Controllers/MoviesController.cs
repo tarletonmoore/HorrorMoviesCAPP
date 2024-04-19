@@ -42,7 +42,18 @@ namespace MyHorrorMovieApp.Controllers
                 // Retrieve the user ID from the token's payload
                 var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
-                // Set the user ID in ViewData to make it available in the view
+                if (!int.TryParse(userId, out int userIdInt))
+                {
+
+                    return BadRequest("Invalid userId format.");
+                }
+
+
+                var user = await _context.Users.FindAsync(userIdInt);
+
+                bool isAdmin = user != null && user.Admin;
+                ViewData["IsAdmin"] = isAdmin;
+
                 ViewData["UserId"] = userId;
                 ViewData["Token"] = token;
                 Console.WriteLine("Index Token!!!!!!!!!: {0}", token);
@@ -118,61 +129,116 @@ namespace MyHorrorMovieApp.Controllers
 
 
         // GET: Movies/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             string token = HttpContext.Request.Query["token"];
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
 
-            // Pass the token to the Create view
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
             ViewData["Token"] = token;
-            // Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
-            return View();
+            ViewData["UserId"] = userId;
+
+            if (isAdmin)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index", new { token = HttpContext.Request.Query["token"] });
+            }
+
         }
 
         // POST: Movies/Create
         [HttpPost]
         public async Task<IActionResult> Create([Bind("Title,Image,Year,Plot")] Movie movie)
         {
-            if (!ModelState.IsValid)
+            string token = HttpContext.Request.Query["token"];
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
             {
-
-                var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                             .Select(e => e.ErrorMessage);
-
-                return Json(new { success = false, errors = errors });
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
             }
 
-            try
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+
+            if (isAdmin)
             {
-                _context.Add(movie);
-                await _context.SaveChangesAsync();
-                return Ok(new { success = true }); // Return success response
+
+                if (!ModelState.IsValid)
+                {
+
+                    var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                 .Select(e => e.ErrorMessage);
+
+                    return Json(new { success = false, errors = errors });
+                }
+
+                try
+                {
+                    _context.Add(movie);
+                    await _context.SaveChangesAsync();
+                    return Ok(new { success = true }); // Return success response
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new { message = "An error occurred while saving the movie." }); // Return error response
+                }
+
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new { message = "An error occurred while saving the movie." }); // Return error response
+                return StatusCode(403, new { message = "Not permitted to add a movie" });
             }
+
         }
 
 
         // GET: Movies/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            string token = HttpContext.Request.Query["token"];
+        // public async Task<IActionResult> Edit(int? id)
+        // {
+        //     string token = HttpContext.Request.Query["token"];
 
-            // Pass the token to the Create view
-            ViewData["Token"] = token;
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //     // Pass the token to the Create view
+        //     ViewData["Token"] = token;
+        //     if (id == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-            return View(movie);
-        }
+        //     var movie = await _context.Movies.FindAsync(id);
+        //     if (movie == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //     return View(movie);
+        // }
 
         // POST: Movies/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -191,34 +257,60 @@ namespace MyHorrorMovieApp.Controllers
             // System.Console.WriteLine("Year!!!: {0}", movie.Year);
             // System.Console.WriteLine("Plot!!!: {0}", movie.Plot);
 
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
 
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
-            if (id != movie.Id)
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
             {
-                return NotFound();
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
             }
 
-            if (ModelState.IsValid)
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+
+            if (isAdmin)
             {
-                try
+
+                if (id != movie.Id)
                 {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
-                    return Ok(); // Assuming you return HTTP 200 OK status to indicate success
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (ModelState.IsValid)
                 {
-                    if (!MovieExists(movie.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(movie);
+                        await _context.SaveChangesAsync();
+                        return Ok(); // Assuming you return HTTP 200 OK status to indicate success
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!MovieExists(movie.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                return BadRequest(ModelState);
             }
-            return BadRequest(ModelState);
+            else
+            {
+
+                return StatusCode(403, new { message = "Not permitted to update movie" });
+            }
         }
 
 
@@ -244,27 +336,52 @@ namespace MyHorrorMovieApp.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            string token = HttpContext.Request.Query["token"];
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
             {
-                var movie = await _context.Movies.FindAsync(id);
-
-                if (movie == null)
-                {
-                    return Json(new { success = false, message = "Movie not found" });
-                }
-
-                _context.Movies.Remove(movie);
-                await _context.SaveChangesAsync();
-
-                return Json(new { success = true });
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
             }
-            catch (Exception ex)
+
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+            if (isAdmin)
             {
-                Console.WriteLine("Exception occurred while deleting movie:", ex);
-                return StatusCode(500, "An error occurred while deleting the movie.");
+                try
+                {
+                    var movie = await _context.Movies.FindAsync(id);
+
+                    if (movie == null)
+                    {
+                        return Json(new { success = false, message = "Movie not found" });
+                    }
+
+                    _context.Movies.Remove(movie);
+                    await _context.SaveChangesAsync();
+
+                    return Json(new { success = true });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception occurred while deleting movie:", ex);
+                    return StatusCode(500, "An error occurred while deleting the movie.");
+                }
+            }
+            else
+            {
+                return StatusCode(403, new { message = "Not permitted to delete movie" });
             }
         }
-
         private bool MovieExists(int id)
         {
             return _context.Movies.Any(e => e.Id == id);

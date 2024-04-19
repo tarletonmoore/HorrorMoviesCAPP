@@ -30,12 +30,15 @@
                         <button type="submit" class="btn btn-primary">Logout</button>
                     </form>
                 </li>
-                <li style="display: inline-block;">
-                    <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
-                        <button class="btn btn-primary">Add
-                            Movie</button>
-                    </a>
-                </li>
+                @if ((bool)ViewData["IsAdmin"])
+                {
+                    <li style="display: inline-block;">
+                        <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                            <button class="btn btn-primary">Add
+                                Movie</button>
+                        </a>
+                    </li>
+                }
             </ul>
         </nav>
 

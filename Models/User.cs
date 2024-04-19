@@ -7,12 +7,13 @@ namespace MyHorrorMovieApp.Models
     public int Id { get; set; }
 
     [Required]
-    [MinLength(3)]
-    [MaxLength(50)]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be at least 3 characters.")]
+
     public string Username { get; set; }
 
     [Required]
-    [MinLength(5)]
+    [StringLength(50, MinimumLength = 5, ErrorMessage = "Password must be at least 5 characters.")]
+
     public string Password { get; set; } = "";
 
     public bool Admin { get; set; }

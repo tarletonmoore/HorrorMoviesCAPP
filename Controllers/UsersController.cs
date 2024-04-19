@@ -49,20 +49,34 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-
         public async Task<IActionResult> Create(User user)
         {
+            // Check if the model state is valid
             if (ModelState.IsValid)
             {
+                // Check if the username is already taken
+                if (_context.Users.Any(u => u.Username == user.Username))
+                {
+                    // If the username is taken, return an error
+                    ModelState.AddModelError("Username", "Username is already taken.");
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, errors = errors });
+                }
+
+                // If the username is not taken, proceed with adding the user
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "Auth");
             }
-            return View(user);
+            else
+            {
+                // If the model state is not valid, return the validation errors
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { success = false, errors = errors });
+            }
         }
+
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
