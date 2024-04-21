@@ -34,13 +34,13 @@
             @if ((bool)ViewData["IsAdmin"])
             {
                 <li style="display: inline-block; margin-right: 10px;">
-                    <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                    <a href="/Movies/Create" style="text-decoration: none;">
                         <button class="btn btn-primary">Add Movie</button>
                     </a>
                 </li>
             }
             <li style="display: inline-block; margin-right: 10px;">
-                <a href="/Movies?token=@ViewData["Token"]" style="text-decoration: none;">
+                <a href="/Movies" style="text-decoration: none;">
                     <button class="btn btn-primary">Back
                         to Movies</button>
                 </a>
@@ -177,12 +177,10 @@
             </div>
 
             <script>
+                var token = '@ViewData["Token"]';
 
                 function submitReview(movieId) {
-                    // Retrieve the JWT token from the URL query parameter
-                    var token = getParameterByName('token');
-
-                    // Check if token exists
+                 
                     if (!token) {
                         console.error('JWT token not found in URL.');
                         return;
@@ -217,7 +215,9 @@
                             console.log('Review created successfully:', data);
                             if (data.success) {
                                 // Redirect to the movies index page
-                                window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
+               
+                                    window.location.href = `/Movies/Details/${movieId}`;
+
                             } else {
                                 // Show error message
                                 console.error('Error creating review:', data.message);
@@ -243,13 +243,9 @@
 
                 function deleteMovie(movieId) {
                     event.preventDefault();
-                    // Retrieve the JWT token from the URL query parameter
-                    var token = getParameterByName('token');
 
-                    console.log("TOKEN!!!!", token);
-                    console.log("movieId", movieId)
                     // Make a DELETE request to delete the movie
-                    fetch(`/Movies/Delete/${movieId}?token=${token}`, {
+                    fetch(`/Movies/Delete/${movieId}`, {
                         method: 'DELETE',
                         headers:
                         {
@@ -270,7 +266,7 @@
                             console.log('Movie deleted successfully:', data);
                             if (data.success) {
                                 // Redirect to the movies index page
-                                window.location.href = `/Movies?token=${token}`;
+                                window.location.href = `/Movies`;
                             } else {
                                 console.error('Error deleting movie:', data.message);
                             }
@@ -289,42 +285,38 @@
                     var year = document.getElementById('Year').value;
                     var plot = document.getElementById('Plot').value;
 
-                    var token = getParameterByName('token');
 
-                    // Send AJAX request to update movie details
-                    $.ajax({
-                        type: 'POST',
-                        url: `/Movies/Edit/${id}?token=${token}`,
-                        data: {
-                            Id: id,
-                            Title: title,
-                            Image: image,
-                            Year: year,
-                            Plot: plot,
-                            token: token
+                        // Send AJAX request to update movie details
+                        $.ajax({
+                            type: 'POST',
+                            url: `/Movies/Edit/${id}`,
+                            data: {
+                                Id: id,
+                                Title: title,
+                                Image: image,
+                                Year: year,
+                                Plot: plot
                         },
-                        success: function (response) {
-                            window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            console.error('Error updating movie:', error);
-                        }
+                success: function (response) {
+                @* window.location.href = `/Movies/Details/@Model.Id?token=${token}`; *@
+                        window.location.href = `/Movies/Details/@Model.Id`;
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.error('Error updating movie:', error);
+                }
                     });
 
-                    // Close the modal
-                    $('#editModal').modal('hide');
+                // Close the modal
+                $('#editModal').modal('hide');
                 }
 
 
 
                 function deleteReview(reviewId) {
                     event.preventDefault();
-                    // Retrieve the JWT token from the URL query parameter
-                    var token = getParameterByName('token');
 
-                    console.log("TOKEN!!!!", token);
-                    console.log("reviewId", reviewId)
+                      
                     // Make a DELETE request to delete the review
                     fetch(`/Reviews/Delete/${reviewId}`, {
                         method: 'DELETE',
@@ -346,7 +338,8 @@
                         }).then(data => {
                             console.log('Review deleted successfully:', data);
                             if (data.success) {
-                                window.location.href = `/Movies/Details/@Model.Id?token=${token}`;
+                
+                                    window.location.href = `/Movies/Details/@Model.Id`;
                             } else {
                                 console.error('Error deleting review:', data.message);
                             }

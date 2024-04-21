@@ -52,25 +52,24 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Reviews/Create
         public IActionResult Create()
         {
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Image");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Password");
-            return View();
+
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+
+            }
+
+
+            return RedirectToAction("Index", "Movies");
         }
 
 
         [HttpPost]
         public async Task<IActionResult> Create(Review review)
         {
-            // Validate the review model
-            // if (!ModelState.IsValid)
-            // {
-            //     // Get the validation errors
-            //     var errors = ModelState.Values.SelectMany(v => v.Errors)
-            //                                   .Select(e => e.ErrorMessage);
-
-            //     // Return a JSON response with the validation errors
-            //     return Json(new { success = false, errors = errors });
-            // }
 
             if (review.Comment.Length < 3)
             {
@@ -79,7 +78,17 @@ namespace MyHorrorMovieApp.Controllers
             }
 
             // Extract userId from the JWT token payload
-            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            // var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
+
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
 
@@ -176,24 +185,20 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // GET: Reviews/Delete/5
-        // public async Task<IActionResult> Delete(int? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            var token = Request.Cookies["token"];
 
-        //     var review = await _context.Reviews
-        //         .Include(r => r.Movie)
-        //         .Include(r => r.User)
-        //         .FirstOrDefaultAsync(m => m.Id == id);
-        //     if (review == null)
-        //     {
-        //         return NotFound();
-        //     }
 
-        //     return View(review);
-        // }
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+
+            }
+
+
+            return RedirectToAction("Index", "Movies");
+        }
 
 
         [HttpDelete]
@@ -204,9 +209,12 @@ namespace MyHorrorMovieApp.Controllers
                 // Retrieve token from cookies
                 var token = Request.Cookies["token"];
 
+
                 if (string.IsNullOrEmpty(token))
                 {
-                    return Unauthorized(); // Return 401 Unauthorized if token is missing
+                    // return an error response or redirect the user to log in
+                    return RedirectToAction("Login", "Auth");
+
                 }
 
                 // Validate and decode the token

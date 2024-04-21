@@ -67,7 +67,6 @@ namespace MyHorrorMovieApp.Controllers
                 // If the username is not taken, proceed with adding the user
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                // return RedirectToAction("Login", "Auth");
                 return Json(new { success = true });
             }
             else

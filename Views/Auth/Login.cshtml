@@ -60,7 +60,9 @@
           // Check if the response indicates successful login
           if (response.success) {
             // Redirect or perform actions for successful login
-            window.location.href = '/Movies?token=' + response.token;
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            window.location.href = '/Movies';
           } else {
             // Show error message
             $('#errorMessage').removeClass('d-none').addClass('show');

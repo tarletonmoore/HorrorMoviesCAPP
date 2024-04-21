@@ -13,6 +13,7 @@ namespace MyHorrorMovieApp.Models
     public string Title { get; set; } = "";
     [Required]
     public string Image { get; set; } = "";
+    [Required(ErrorMessage = "Year is required")]
 
     public int Year { get; set; }
 

@@ -31,7 +31,7 @@
                 <button type="submit" class="btn btn-primary">Logout</button>
             </form>
         </li>
-        <a href="/Movies?token=@ViewData["Token"]" style="text-decoration: none;">
+        <a href="/Movies" style="text-decoration: none;">
             <button class="btn btn-primary">Back to Movies</button>
         </a>
     </ul>
@@ -99,7 +99,7 @@
         const formData = new FormData(this);
 
 
-        fetch(`/Movies/Create?token=@token`, {
+        fetch(`/Movies/Create`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -117,7 +117,7 @@
                 console.log('Movie created successfully:', data);
                 if (data.success) {
                     // Redirect to the movies index page
-                    window.location.href = `/Movies?token=@token`;
+                    window.location.href = `/Movies`;
                 } else {
                     console.error('Error creating movie:', data.errors);
                     displayErrorMessage(data.errors);
@@ -138,6 +138,11 @@
 
         // Iterate over the errors array and create list items for each error message
         errors.forEach(function (error) {
+            // Replace the generic "invalid string" error message for the Year property
+            if (error.includes("The value '' is invalid.")) {
+                error = "The Year field is required.";
+            }
+
             var listItem = document.createElement('li');
             listItem.textContent = error;
             errorListElement.appendChild(listItem);
@@ -147,6 +152,7 @@
         var errorMessageElement = document.getElementById('errorMessage');
         errorMessageElement.classList.remove('d-none');
     }
+
 
 </script>
 

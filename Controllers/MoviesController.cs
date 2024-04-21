@@ -25,12 +25,14 @@ namespace MyHorrorMovieApp.Controllers
         public async Task<IActionResult> Index()
         {
             // Retrieve the token from the query string
-            string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
 
             if (string.IsNullOrEmpty(token))
             {
                 // return an error response or redirect the user to log in
-                return BadRequest("JWT token is missing or invalid.");
+                return RedirectToAction("Login", "Auth");
+
             }
 
             try
@@ -81,10 +83,17 @@ namespace MyHorrorMovieApp.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
 
             ViewData["Token"] = token;
-            // Console.WriteLine("Create Token!!!!!!!!!: {0}", token);
 
             if (id == null)
             {
@@ -131,7 +140,15 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Movies/Create
         public async Task<IActionResult> Create()
         {
-            string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(token);
 
@@ -168,7 +185,16 @@ namespace MyHorrorMovieApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([Bind("Title,Image,Year,Plot")] Movie movie)
         {
-            string token = HttpContext.Request.Query["token"];
+            // string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(token);
 
@@ -221,24 +247,20 @@ namespace MyHorrorMovieApp.Controllers
 
 
         // GET: Movies/Edit/5
-        // public async Task<IActionResult> Edit(int? id)
-        // {
-        //     string token = HttpContext.Request.Query["token"];
+        public async Task<IActionResult> Edit(int? id)
+        {
+            var token = Request.Cookies["token"];
 
-        //     // Pass the token to the Create view
-        //     ViewData["Token"] = token;
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
 
-        //     var movie = await _context.Movies.FindAsync(id);
-        //     if (movie == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return View(movie);
-        // }
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+
+            }
+
+
+            return RedirectToAction("Index", new { token = HttpContext.Request.Query["token"] });
+        }
 
         // POST: Movies/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -246,7 +268,15 @@ namespace MyHorrorMovieApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image,Year,Plot")] Movie movie)
         {
-            string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
 
             // Pass the token to the Create view
             ViewData["Token"] = token;
@@ -317,26 +347,35 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Movies/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+
+            }
             if (id == null)
             {
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return View(movie);
+            return RedirectToAction("Index", new { token = HttpContext.Request.Query["token"] });
         }
 
         // Delete: Movies/Delete/5
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            string token = HttpContext.Request.Query["token"];
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(token);
 

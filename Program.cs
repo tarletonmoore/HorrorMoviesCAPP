@@ -150,4 +150,7 @@ app.MapControllerRoute(
     defaults: new { controller = "Reviews", action = "Delete" }
 );
 
+app.MapFallbackToController("Index", "Movies");
+
+
 app.Run();

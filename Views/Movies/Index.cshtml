@@ -33,7 +33,7 @@
                 @if ((bool)ViewData["IsAdmin"])
                 {
                     <li style="display: inline-block;">
-                        <a href="/Movies/Create?token=@ViewData["Token"]" style="text-decoration: none;">
+                        <a href="/Movies/Create" style="text-decoration: none;">
                             <button class="btn btn-primary">Add
                                 Movie</button>
                         </a>
@@ -71,7 +71,8 @@
                             <br />
                             <hr />
                             <div>
-                                <a href="/Movies/Details/@movie.Id?token=@ViewData["Token"]" class="btn btn-primary">Movie
+                                <a href="/Movies/Details/@movie.Id" @* ?token=@ViewData["Token"]" *@
+                                    class="btn btn-primary">Movie
                                     Details</a>
                             </div>
 
