@@ -20,41 +20,55 @@
 
 </head>
 
-<nav class="mb-4 nav">
-    <ul style="list-style: none; padding: 0; margin: 0;">
-        <li style="display: inline-block; margin-right: 10px;">
-            <form method="post" action="/logout">
-                <button type="submit" class="btn btn-primary">Logout</button>
-            </form>
-        </li>
-        @* @if ((bool)ViewData["IsAdmin"])
-        {
-        <li style="display: inline-block; margin-right: 10px;">
-        <a href="/Movies/Create" style="text-decoration: none;">
-        <button class="btn btn-primary">Add Movie</button>
-        </a>
-        </li>
-        } *@
-        <li style="display: inline-block; margin-right: 10px;">
-            <a href="/Movies" style="text-decoration: none;">
-                <button class="btn btn-primary">Back
-                    to Movies</button>
-            </a>
-        </li>
-    </ul>
-</nav>
+<div class="container">
+    <nav class="mb-4 nav">
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="display: inline-block; margin-right: 10px;">
+                <form method="post" action="/logout">
+                    <button type="submit" class="btn btn-primary">Logout</button>
+                </form>
+            </li>
+            @if ((bool)ViewData["IsAdmin"])
+            {
+                <li style="display: inline-block; margin-right: 10px;">
+                    <a href="/Movies/Create" style="text-decoration: none;">
+                        <button class="btn btn-primary">Add Movie</button>
+                    </a>
+                </li>
+            }
+            <li style="display: inline-block; margin-right: 10px;">
+                <a href="/Movies" style="text-decoration: none;">
+                    <button class="btn btn-primary">Back
+                        to Movies</button>
+                </a>
+            </li>
+        </ul>
+    </nav>
 
-<h1>@Model.Username's Profile</h1>
+    <h1>@Model.Username's Profile</h1>
 
-<div>
-    @* <h4>@Model.Username's Profile</h4> *@
-    <hr />
-    <div class="row">
-        <p>Profile page</p>
+    <div>
+        <hr />
+        <div class="row">
+            <p>Profile page</p>
 
+        </div>
     </div>
+    @* <div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+    </div> *@
+
 </div>
-@* <div>
-<a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-<a asp-action="Index">Back to List</a>
-</div> *@
+
+<style>
+    body {
+        background-color: #121212;
+        color: #fff;
+        width: 100%;
+    }
+
+    nav.mb-4 {
+        padding-top: 10px;
+    }
+</style>

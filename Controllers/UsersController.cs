@@ -59,6 +59,9 @@ namespace MyHorrorMovieApp.Controllers
                 return BadRequest("Invalid userId format.");
             }
             var user = await _context.Users.FindAsync(userIdInt);
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+
             return View(user);
         }
 

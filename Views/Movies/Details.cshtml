@@ -31,6 +31,11 @@
                     <button type="submit" class="btn btn-primary">Logout</button>
                 </form>
             </li>
+            <li style="display: inline-block; margin-right: 10px;">
+                <a href="/me" style="text-decoration: none;">
+                    <button class="btn btn-primary">Profile</button>
+                </a>
+            </li>
             @if ((bool)ViewData["IsAdmin"])
             {
                 <li style="display: inline-block; margin-right: 10px;">
@@ -180,7 +185,7 @@
                 var token = '@ViewData["Token"]';
 
                 function submitReview(movieId) {
-                 
+
                     if (!token) {
                         console.error('JWT token not found in URL.');
                         return;
@@ -215,8 +220,8 @@
                             console.log('Review created successfully:', data);
                             if (data.success) {
                                 // Redirect to the movies index page
-               
-                                    window.location.href = `/Movies/Details/${movieId}`;
+
+                                window.location.href = `/Movies/Details/${movieId}`;
 
                             } else {
                                 // Show error message
@@ -286,29 +291,29 @@
                     var plot = document.getElementById('Plot').value;
 
 
-                        // Send AJAX request to update movie details
-                        $.ajax({
-                            type: 'POST',
-                            url: `/Movies/Edit/${id}`,
-                            data: {
-                                Id: id,
-                                Title: title,
-                                Image: image,
-                                Year: year,
-                                Plot: plot
+                    // Send AJAX request to update movie details
+                    $.ajax({
+                        type: 'POST',
+                        url: `/Movies/Edit/${id}`,
+                        data: {
+                            Id: id,
+                            Title: title,
+                            Image: image,
+                            Year: year,
+                            Plot: plot
                         },
-                success: function (response) {
+                        success: function (response) {
                 @* window.location.href = `/Movies/Details/@Model.Id?token=${token}`; *@
-                        window.location.href = `/Movies/Details/@Model.Id`;
-                },
-                error: function (xhr, status, error) {
-                    // Handle error
-                    console.error('Error updating movie:', error);
-                }
+                                window.location.href = `/Movies/Details/@Model.Id`;
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            console.error('Error updating movie:', error);
+                        }
                     });
 
-                // Close the modal
-                $('#editModal').modal('hide');
+                    // Close the modal
+                    $('#editModal').modal('hide');
                 }
 
 
@@ -316,7 +321,7 @@
                 function deleteReview(reviewId) {
                     event.preventDefault();
 
-                      
+
                     // Make a DELETE request to delete the review
                     fetch(`/Reviews/Delete/${reviewId}`, {
                         method: 'DELETE',
@@ -338,8 +343,8 @@
                         }).then(data => {
                             console.log('Review deleted successfully:', data);
                             if (data.success) {
-                
-                                    window.location.href = `/Movies/Details/@Model.Id`;
+
+                                window.location.href = `/Movies/Details/@Model.Id`;
                             } else {
                                 console.error('Error deleting review:', data.message);
                             }
