@@ -4,27 +4,57 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<nav class="mb-4 nav">
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="display: inline-block; margin-right: 10px;">
+            <form method="post" action="/logout">
+                <button type="submit" class="btn btn-primary">Logout</button>
+            </form>
+        </li>
+        @* @if ((bool)ViewData["IsAdmin"])
+        {
+        <li style="display: inline-block; margin-right: 10px;">
+        <a href="/Movies/Create" style="text-decoration: none;">
+        <button class="btn btn-primary">Add Movie</button>
+        </a>
+        </li>
+        } *@
+        <li style="display: inline-block; margin-right: 10px;">
+            <a href="/Movies" style="text-decoration: none;">
+                <button class="btn btn-primary">Back
+                    to Movies</button>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<h1>@Model.Username's Profile</h1>
 
 <div>
-    <h4>User</h4>
+    @* <h4>@Model.Username's Profile</h4> *@
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Username)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Username)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-    </dl>
+    <div class="row">
+        <p>Profile page</p>
+
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@* <div>
+<a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+<a asp-action="Index">Back to List</a>
+</div> *@

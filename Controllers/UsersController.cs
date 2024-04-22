@@ -6,16 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
+using System.IdentityModel.Tokens.Jwt;
+using MyHorrorMovieApp.Services;
 
 namespace MyHorrorMovieApp.Controllers
 {
     public class UsersController : Controller
     {
         private readonly MyDbContext _context;
+        private readonly PasswordHashingService _passwordHashingService;
 
-        public UsersController(MyDbContext context)
+
+        public UsersController(MyDbContext context, PasswordHashingService passwordHashingService)
         {
             _context = context;
+            _passwordHashingService = passwordHashingService;
+
         }
 
         // GET: Users
@@ -25,20 +31,34 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details()
         {
-            if (id == null)
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
             {
-                return NotFound();
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            // Validate and decode the token
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
 
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            System.Console.WriteLine("USERID!!!! {0}", userId);
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+            var user = await _context.Users.FindAsync(userIdInt);
             return View(user);
         }
 
@@ -64,7 +84,11 @@ namespace MyHorrorMovieApp.Controllers
                     return Json(new { success = false, errors = errors });
                 }
 
-                // If the username is not taken, proceed with adding the user
+                // Hash the password before storing it in the database
+                string hashedPassword = _passwordHashingService.HashPassword(user.Password);
+                user.Password = hashedPassword; // Assign the hashed password to the user object
+
+                // If the username is not taken and the model state is valid, proceed with adding the user
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });

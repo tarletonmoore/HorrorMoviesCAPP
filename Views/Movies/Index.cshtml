@@ -30,6 +30,11 @@
                         <button type="submit" class="btn btn-primary">Logout</button>
                     </form>
                 </li>
+                <li style="display: inline-block; margin-right: 10px;">
+                    <a href="/me" style="text-decoration: none;">
+                        <button class="btn btn-primary">Profile</button>
+                    </a>
+                </li>
                 @if ((bool)ViewData["IsAdmin"])
                 {
                     <li style="display: inline-block;">

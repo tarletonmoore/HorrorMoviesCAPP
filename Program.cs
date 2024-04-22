@@ -28,6 +28,7 @@ if (secretKey == null)
 }
 
 builder.Services.AddScoped<AuthService>(); // Register AuthService
+builder.Services.AddScoped<PasswordHashingService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -104,6 +105,12 @@ app.MapControllerRoute(
     name: "users",
     pattern: "Users/Create",
     defaults: new { controller = "Users", action = "Create" }
+);
+
+app.MapControllerRoute(
+    name: "me",
+    pattern: "me",
+    defaults: new { controller = "Users", action = "Details" }
 );
 
 app.MapControllerRoute(

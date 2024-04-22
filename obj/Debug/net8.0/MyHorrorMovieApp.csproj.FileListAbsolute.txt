@@ -274,3 +274,4 @@
 /Users/tarletonmoore/Desktop/Actualize/C#/MyHorrorMovieApp/obj/Debug/net8.0/MyHorrorMovieApp.pdb
 /Users/tarletonmoore/Desktop/Actualize/C#/MyHorrorMovieApp/obj/Debug/net8.0/MyHorrorMovieApp.genruntimeconfig.cache
 /Users/tarletonmoore/Desktop/Actualize/C#/MyHorrorMovieApp/obj/Debug/net8.0/ref/MyHorrorMovieApp.dll
+/Users/tarletonmoore/Desktop/Actualize/C#/MyHorrorMovieApp/bin/Debug/net8.0/BCrypt.Net-Next.dll

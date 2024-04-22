@@ -10,11 +10,15 @@ namespace MyHorrorMovieApp.Controllers
   {
     private readonly AuthService _authService;
     private readonly MyDbContext _context;
+    private readonly PasswordHashingService _passwordHashingService;
 
-    public AuthController(AuthService authService, MyDbContext context)
+
+    public AuthController(AuthService authService, MyDbContext context, PasswordHashingService passwordHashingService)
     {
       _authService = authService;
       _context = context;
+      _passwordHashingService = passwordHashingService;
+
     }
 
     // [HttpGet("login")]
@@ -36,11 +40,11 @@ namespace MyHorrorMovieApp.Controllers
         return Json(new { success = false, errorMessage = "Invalid username or password" });
       }
 
-      // Validate the user credentials and retrieve the user ID
-      var user = _context.Users.SingleOrDefault(u => u.Username == model.Username && u.Password == model.Password);
-      if (user == null)
+      // Validate the user credentials and retrieve the user from the database
+      var user = _context.Users.SingleOrDefault(u => u.Username == model.Username);
+      if (user == null || !_passwordHashingService.VerifyPassword(user.Password, model.Password))
       {
-        // User not found, return error JSON
+        // User not found or password doesn't match, return error JSON
         return Json(new { success = false, errorMessage = "Invalid username or password" });
       }
 
