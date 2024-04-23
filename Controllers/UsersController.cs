@@ -50,7 +50,6 @@ namespace MyHorrorMovieApp.Controllers
             // Retrieve the user ID from the token's payload
             var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
-            System.Console.WriteLine("USERID!!!! {0}", userId);
 
             // Convert userId to integer
             if (!int.TryParse(userId, out int userIdInt))
@@ -58,9 +57,17 @@ namespace MyHorrorMovieApp.Controllers
                 // Handle invalid userId here, such as returning an error response
                 return BadRequest("Invalid userId format.");
             }
-            var user = await _context.Users.FindAsync(userIdInt);
+
+            var user = await _context.Users
+                .Include(u => u.Favorites)
+                    .ThenInclude(f => f.Movie)
+                .SingleOrDefaultAsync(u => u.Id == userIdInt);
+
+
             bool isAdmin = user != null && user.Admin;
             ViewData["IsAdmin"] = isAdmin;
+            ViewData["Token"] = token;
+
 
             return View(user);
         }

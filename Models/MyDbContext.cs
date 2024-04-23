@@ -12,6 +12,8 @@ namespace MyHorrorMovieApp.Models
     public DbSet<User> Users { get; set; }
     public DbSet<Movie> Movies { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<Favorite> Favorites { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +27,20 @@ namespace MyHorrorMovieApp.Models
           .HasOne(r => r.Movie)
           .WithMany(m => m.Reviews)
           .HasForeignKey(r => r.MovieId);
+
+      // modelBuilder.Entity<Favorite>()
+      //    .Property(f => f.Id)
+      //    .ValueGeneratedOnAdd();
+
+      modelBuilder.Entity<Favorite>()
+          .HasOne(f => f.User)
+          .WithMany(u => u.Favorites)
+          .HasForeignKey(f => f.UserId);
+
+      modelBuilder.Entity<Favorite>()
+          .HasOne(f => f.Movie)
+          .WithMany(m => m.Favorites)
+          .HasForeignKey(f => f.MovieId);
 
 
       // Seed data

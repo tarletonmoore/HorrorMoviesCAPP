@@ -157,6 +157,18 @@ app.MapControllerRoute(
     defaults: new { controller = "Reviews", action = "Delete" }
 );
 
+app.MapControllerRoute(
+    name: "favorites",
+    pattern: "Favorites/Create",
+    defaults: new { controller = "Favorites", action = "Create" }
+);
+
+app.MapControllerRoute(
+    name: "favorites",
+    pattern: "Favorites/Delete/{id}",
+    defaults: new { controller = "Favorites", action = "Delete" }
+);
+
 app.MapFallbackToController("Index", "Movies");
 
 

@@ -96,6 +96,8 @@
                     <hr />
                     <h3>Plot:</h3>
                     <h3>@Model.Plot</h3>
+                    <br />
+                    <button class="btn btn-primary" onclick="addFavorite()">Add To Favorites</button>
                     <hr />
                     <br />
                     <br />
@@ -183,6 +185,30 @@
 
             <script>
                 var token = '@ViewData["Token"]';
+
+                function addFavorite() {
+                    if (!token) {
+                        console.error('JWT token not found.');
+                        return;
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: `/Favorites/Create`,
+                        data: {
+                            UserId: @ViewData["UserId"],
+                            MovieId: @Model.Id
+
+                        },
+                        success: function (response) {
+
+                            window.location.href = `/me`;
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            console.error('Error updating movie:', error);
+                        }
+                    });
+                }
 
                 function submitReview(movieId) {
 
