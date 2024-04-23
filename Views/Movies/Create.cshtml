@@ -95,6 +95,29 @@
 
     </div>
 </div>
+<br />
+<div id="movieCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @if (ViewData["Movies"] is List<MyHorrorMovieApp.Models.Movie> movies)
+        {
+            @foreach (var movie in movies)
+            {
+                <div class="carousel-item @(movie == movies[0] ? "active" : "")">
+                    <img src="@movie.Image" class="d-block w-100" style="max-height: 400px; object-fit: contain;"
+                        alt="Movie Image">
+                </div>
+            }
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
 
 
 <script>
@@ -176,5 +199,11 @@
         background-color: #4d0000;
         color: white;
         margin-left: 10px;
+    }
+
+    .carousel-item img {
+        max-height: 300px;
+        width: auto;
+        margin: auto;
     }
 </style>

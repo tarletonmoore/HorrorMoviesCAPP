@@ -170,6 +170,9 @@ namespace MyHorrorMovieApp.Controllers
             ViewData["Token"] = token;
             ViewData["UserId"] = userId;
 
+            var movies = await _context.Movies.ToListAsync();
+            ViewData["Movies"] = movies;
+
             if (isAdmin)
             {
                 return View();
