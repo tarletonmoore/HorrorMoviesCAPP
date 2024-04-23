@@ -113,6 +113,14 @@ app.MapControllerRoute(
     defaults: new { controller = "Users", action = "Details" }
 );
 
+
+app.MapControllerRoute(
+    name: "ViewProfile",
+    pattern: "Users/Profile/{username}",
+    defaults: new { controller = "Users", action = "ViewProfile" }
+);
+
+
 app.MapControllerRoute(
     name: "movies",
     pattern: "Movies",

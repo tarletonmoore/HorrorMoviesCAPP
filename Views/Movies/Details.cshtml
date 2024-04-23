@@ -121,7 +121,8 @@
                             @foreach (var review in Model.Reviews)
                             {
                                 <li>
-                                    <span>@review.User.Username: @review.Comment</span>
+                                    <span> <a href="/Users/Profile/@review.User.Username"
+                                            style="text-decoration: none;">@review.User.Username</a>: @review.Comment</span>
                                     @if (ViewData["UserId"].ToString() == review.UserId.ToString())
                                     {
                                         <button class="btn btn-danger" onclick="deleteReview(@review.Id)">X</button>

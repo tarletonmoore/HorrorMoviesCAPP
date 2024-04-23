@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Details";
+        int currentUserId = (int)ViewData["CurrentUserId"];
+
 }
 
 <head>
@@ -28,6 +30,13 @@
                     <button type="submit" class="btn btn-primary">Logout</button>
                 </form>
             </li>
+             @if(Model.Id != currentUserId){
+                 <li style="display: inline-block; margin-right: 10px;">
+            <a href="/me" style="text-decoration: none;">
+                <button class="btn btn-primary">Profile</button>
+            </a>
+        </li>
+}
             @if ((bool)ViewData["IsAdmin"])
             {
                 <li style="display: inline-block; margin-right: 10px;">
@@ -46,6 +55,9 @@
     </nav>
 
     <h1>@Model.Username's Profile</h1>
+         @if(Model.Id != currentUserId){
+            <button class="btn btn-primary" onclick="addFriend()">Add Friend</button>
+            }
 
     <div>
         <hr />
@@ -59,9 +71,11 @@
                         <div class="card border border-light">
                             <div class="card-header border-bottom">
                                 <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <button class="btn btn-danger" onclick="deleteFavorite(@favorite.Id)">X</button>
-                                    </div>
+                                    @if (favorite.UserId == currentUserId){
+                                        <div class="col-auto">
+                                            <button class="btn btn-danger" onclick="deleteFavorite(@favorite.Id)">X</button>
+                                        </div>
+}
                                     <div class="col card-title text-center">
                                         <h4 class="m-0">@favorite.Movie.Title</h4>
                                     </div>
@@ -103,6 +117,10 @@
 
 <script>
     var token = '@ViewData["Token"]';
+
+    function addFriend() {
+        console.log("Friend Added!")
+    }
 
     function deleteFavorite(favoriteId) {
         event.preventDefault();

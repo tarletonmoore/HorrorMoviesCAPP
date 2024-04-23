@@ -67,10 +67,58 @@ namespace MyHorrorMovieApp.Controllers
             bool isAdmin = user != null && user.Admin;
             ViewData["IsAdmin"] = isAdmin;
             ViewData["Token"] = token;
+            ViewData["CurrentUserId"] = userIdInt;
 
 
             return View(user);
         }
+
+        public async Task<IActionResult> ViewProfile(string username)
+        {
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+
+            }
+
+            // Validate and decode the token
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+            // Retrieve the user based on the provided username
+            var user = await _context.Users
+                .Include(u => u.Favorites)
+                    .ThenInclude(f => f.Movie)
+                .SingleOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                // Handle case where user with the given username is not found
+                return NotFound();
+            }
+
+            bool isAdmin = user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+            ViewData["CurrentUserId"] = userIdInt;
+
+
+            return View("Details", user); // Assuming "Details" is the name of your view for displaying user profiles
+        }
+
 
         // GET: Users/Create
         public IActionResult Create()
