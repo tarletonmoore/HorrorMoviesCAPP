@@ -50,6 +50,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmF2b3JpdGVzL0luZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/FriendRequests/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRnJpZW5kUmVxdWVzdHMvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/FriendRequests/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRnJpZW5kUmVxdWVzdHMvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/FriendRequests/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRnJpZW5kUmVxdWVzdHMvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/FriendRequests/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRnJpZW5kUmVxdWVzdHMvRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/FriendRequests/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRnJpZW5kUmVxdWVzdHMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/tarletonmoore/Desktop/Actualize/C\#/MyHorrorMovieApp/Views/Movies/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTW92aWVzL0NyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

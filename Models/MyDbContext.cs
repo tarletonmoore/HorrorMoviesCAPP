@@ -14,6 +14,9 @@ namespace MyHorrorMovieApp.Models
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
 
+    public DbSet<FriendRequest> FriendRequests { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,10 +31,6 @@ namespace MyHorrorMovieApp.Models
           .WithMany(m => m.Reviews)
           .HasForeignKey(r => r.MovieId);
 
-      // modelBuilder.Entity<Favorite>()
-      //    .Property(f => f.Id)
-      //    .ValueGeneratedOnAdd();
-
       modelBuilder.Entity<Favorite>()
           .HasOne(f => f.User)
           .WithMany(u => u.Favorites)
@@ -41,6 +40,19 @@ namespace MyHorrorMovieApp.Models
           .HasOne(f => f.Movie)
           .WithMany(m => m.Favorites)
           .HasForeignKey(f => f.MovieId);
+
+      modelBuilder.Entity<FriendRequest>()
+.HasOne(fr => fr.Receiver)
+.WithMany(u => u.ReceivedFriendRequests)
+.HasForeignKey(fr => fr.ReceiverId)
+.OnDelete(DeleteBehavior.Cascade);
+
+      modelBuilder.Entity<FriendRequest>()
+          .HasOne(fr => fr.Sender)
+          .WithMany(u => u.SentFriendRequests)
+          .HasForeignKey(fr => fr.SenderId)
+          .OnDelete(DeleteBehavior.Cascade);
+
 
 
       // Seed data
