@@ -177,6 +177,13 @@ app.MapControllerRoute(
     defaults: new { controller = "Favorites", action = "Delete" }
 );
 
+app.MapControllerRoute(
+    name: "checkIfInFavorites",
+    pattern: "Favorites/CheckIfInFavorites/{movieId}",
+    defaults: new { controller = "Favorites", action = "CheckIfInFavorites" }
+);
+
+
 app.MapFallbackToController("Index", "Movies");
 
 

@@ -97,7 +97,11 @@
                     <h3>Plot:</h3>
                     <h3>@Model.Plot</h3>
                     <br />
-                    <button class="btn btn-primary" onclick="addFavorite()">Add To Favorites</button>
+                    @* <button class="btn btn-primary" onclick="addFavorite()">Add To Favorites</button> *@
+                    <button id="addToFavoritesBtn" class="btn btn-primary" onclick="addFavorite()">Add To
+                        Favorites</button>
+                    <span id="alreadyInFavoritesMsg" style="display: none;">Already in favorites</span>
+
                     <hr />
                     <br />
                     <br />
@@ -187,29 +191,62 @@
             <script>
                 var token = '@ViewData["Token"]';
 
+                $(document).ready(function () {
+                    // Function to check if the movie is already in favorites
+                    $.ajax({
+                        type: 'GET',
+                        url: `/Favorites/CheckIfInFavorites/@Model.Id`,
+                        success: function (response) {
+                            if (response.isInFavorites) {
+                                // Movie is already in favorites, hide the add button and show the message
+                                $('#addToFavoritesBtn').hide();
+                                $('#alreadyInFavoritesMsg').show();
+                            } else {
+                                // Movie is not in favorites, show the add button
+                                $('#addToFavoritesBtn').show();
+                                $('#alreadyInFavoritesMsg').hide();
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            console.error('Error checking if movie is in favorites:', error);
+                        }
+                    });
+                });
+
+                // Function to add the movie to favorites
                 function addFavorite() {
                     if (!token) {
                         console.error('JWT token not found.');
                         return;
                     }
+
                     $.ajax({
                         type: 'POST',
                         url: `/Favorites/Create`,
                         data: {
-                            UserId: @ViewData["UserId"],
                             MovieId: @Model.Id
-
-                        },
+        },
                         success: function (response) {
-
-                            window.location.href = `/me`;
+                            // Check if the request was successful
+                            if (response.success) {
+                                // Redirect to the user's profile page
+                                window.location.href = `/me`;
+                            } else {
+                                // Handle error
+                                console.error('Error adding movie to favorites:', response.message);
+                            }
                         },
                         error: function (xhr, status, error) {
                             // Handle error
-                            console.error('Error updating movie:', error);
+                            console.error('Error adding movie to favorites:', error);
                         }
                     });
+
+                    return false; // Prevent the default form submission
                 }
+
+
 
                 function submitReview(movieId) {
 

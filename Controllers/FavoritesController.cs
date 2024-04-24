@@ -94,6 +94,15 @@ namespace MyHorrorMovieApp.Controllers
                 return BadRequest("Invalid userId format.");
             }
 
+            var existingFavorite = await _context.Favorites
+                                       .FirstOrDefaultAsync(f => f.MovieId == favorite.MovieId && f.UserId == userIdInt);
+
+            if (existingFavorite != null)
+            {
+                // Movie is already in favorites, return an appropriate response
+                return Json(new { success = false, message = "Movie is already in favorites" });
+            }
+
             favorite.UserId = userIdInt;
 
             // Retrieve the movie associated with the review
@@ -117,6 +126,38 @@ namespace MyHorrorMovieApp.Controllers
             // Return a JSON response indicating success
             return Json(new { success = true });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckIfInFavorites(int movieId)
+        {
+            var token = Request.Cookies["token"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // No token found, return an error response or redirect the user to log in
+                return Unauthorized();
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            // Check if the movie is already in favorites for the user
+            var isInFavorites = await _context.Favorites
+                                            .AnyAsync(f => f.MovieId == movieId && f.UserId == userIdInt);
+
+            return Json(new { isInFavorites });
+        }
+
 
         // GET: Favorites/Edit/5
         public async Task<IActionResult> Edit(int? id)
