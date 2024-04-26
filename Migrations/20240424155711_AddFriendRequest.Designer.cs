@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyHorrorMovieApp.Models;
 
@@ -10,9 +11,11 @@ using MyHorrorMovieApp.Models;
 namespace MyHorrorMovieApp.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424155711_AddFriendRequest")]
+    partial class AddFriendRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
@@ -159,52 +162,49 @@ namespace MyHorrorMovieApp.Migrations
                 });
 
             modelBuilder.Entity("MyHorrorMovieApp.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Admin")
-                        .HasColumnType("INTEGER");
+                b.Property<bool>("Admin")
+                    .HasColumnType("INTEGER");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                b.Property<string>("Password")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("TEXT");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("INTEGER");
+                b.Property<string>("Username")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                b.HasKey("Id");
 
-                    b.HasKey("Id");
+                b.HasIndex("Username")
+                    .IsUnique();
 
-                    b.HasIndex("UserId");
+                b.ToTable("Users");
 
-                    b.HasIndex("Username")
-                        .IsUnique();
+                b.HasData(
+                    new
+                    {
+                        Id = 1,
+                        Admin = false,
+                        Password = "password",
+                        Username = "tarleton"
+                    },
+                    new
+                    {
+                        Id = 2,
+                        Admin = false,
+                        Password = "password",
+                        Username = "test"
+                    });
+            });
 
-                    b.ToTable("Users");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Admin = false,
-                            Password = "password",
-                            Username = "tarleton"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Admin = false,
-                            Password = "password",
-                            Username = "test"
-                        });
-                });
 
             modelBuilder.Entity("MyHorrorMovieApp.Models.Favorite", b =>
                 {
@@ -263,13 +263,6 @@ namespace MyHorrorMovieApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MyHorrorMovieApp.Models.User", b =>
-                {
-                    b.HasOne("MyHorrorMovieApp.Models.User", null)
-                        .WithMany("Friends")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("MyHorrorMovieApp.Models.Movie", b =>
                 {
                     b.Navigation("Favorites");
@@ -280,8 +273,6 @@ namespace MyHorrorMovieApp.Migrations
             modelBuilder.Entity("MyHorrorMovieApp.Models.User", b =>
                 {
                     b.Navigation("Favorites");
-
-                    b.Navigation("Friends");
 
                     b.Navigation("ReceivedFriendRequests");
 

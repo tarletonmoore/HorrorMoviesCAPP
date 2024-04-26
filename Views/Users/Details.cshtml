@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Details";
         int currentUserId = (int)ViewData["CurrentUserId"];
+        @* int profileId = (int)ViewData["ProfileId"]; *@
+            int? profileId = ViewData["ProfileId"] as int?;
+
 
 }
 
@@ -37,6 +40,11 @@
             </a>
         </li>
 }
+   <li style="display: inline-block; margin-right: 10px;">
+                    <a href="/FriendRequests" style="text-decoration: none;">
+                        <button class="btn btn-primary">Friend Requests</button>
+                    </a>
+                </li>
             @if ((bool)ViewData["IsAdmin"])
             {
                 <li style="display: inline-block; margin-right: 10px;">
@@ -56,7 +64,7 @@
 
     <h1>@Model.Username's Profile</h1>
          @if(Model.Id != currentUserId){
-            <button class="btn btn-primary" onclick="addFriend()">Add Friend</button>
+            <button class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
             }
 
     <div>
@@ -119,9 +127,25 @@
 <script>
     var token = '@ViewData["Token"]';
 
-    function addFriend() {
-        console.log("Friend Added!")
-    }
+function addFriend(profileId) {
+
+    $.ajax({
+        type: "POST",
+        url: "/FriendRequests/Create", 
+        data: {
+            RecipientId: profileId 
+        },
+        success: function (response) {
+            console.log("Friend request sent successfully.");
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.error("Error sending friend request:", error);
+            
+        }
+    });
+}
+
 
     function deleteFavorite(favoriteId) {
         event.preventDefault();

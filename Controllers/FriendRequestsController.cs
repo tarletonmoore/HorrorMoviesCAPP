@@ -1,169 +1,230 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.AspNetCore.Mvc.Rendering;
-// using Microsoft.EntityFrameworkCore;
-// using MyHorrorMovieApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using MyHorrorMovieApp.Models;
+using System.IdentityModel.Tokens.Jwt;
 
-// namespace MyHorrorMovieApp.Controllers
-// {
-//     public class FriendRequestsController : Controller
-//     {
-//         private readonly MyDbContext _context;
 
-//         public FriendRequestsController(MyDbContext context)
-//         {
-//             _context = context;
-//         }
+namespace MyHorrorMovieApp.Controllers
+{
+    public class FriendRequestsController : Controller
+    {
+        private readonly MyDbContext _context;
 
-//         // GET: FriendRequests
-//         public async Task<IActionResult> Index()
-//         {
-//             var myDbContext = _context.FriendRequests.Include(f => f.Receiver).Include(f => f.Sender);
-//             return View(await myDbContext.ToListAsync());
-//         }
+        public FriendRequestsController(MyDbContext context)
+        {
+            _context = context;
+        }
 
-//         // GET: FriendRequests/Details/5
-//         public async Task<IActionResult> Details(int? id)
-//         {
-//             if (id == null)
-//             {
-//                 return NotFound();
-//             }
+        // GET: FriendRequests
+        public async Task<IActionResult> Index()
+        {
+            var token = Request.Cookies["token"];
 
-//             var friendRequest = await _context.FriendRequests
-//                 .Include(f => f.Receiver)
-//                 .Include(f => f.Sender)
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (friendRequest == null)
-//             {
-//                 return NotFound();
-//             }
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+            }
 
-//             return View(friendRequest);
-//         }
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
 
-//         // GET: FriendRequests/Create
-//         public IActionResult Create()
-//         {
-//             ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "Password");
-//             ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password");
-//             return View();
-//         }
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
-//         // POST: FriendRequests/Create
-//         // To protect from overposting attacks, enable the specific properties you want to bind to.
-//         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Create([Bind("Id,SenderId,ReceiverId,Status")] FriendRequest friendRequest)
-//         {
-//             if (ModelState.IsValid)
-//             {
-//                 _context.Add(friendRequest);
-//                 await _context.SaveChangesAsync();
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.ReceiverId);
-//             ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
-//             return View(friendRequest);
-//         }
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+            var user = await _context.Users.FindAsync(userIdInt);
 
-//         // GET: FriendRequests/Edit/5
-//         public async Task<IActionResult> Edit(int? id)
-//         {
-//             if (id == null)
-//             {
-//                 return NotFound();
-//             }
+            bool isAdmin = user != null && user.Admin;
+            ViewData["IsAdmin"] = isAdmin;
+            ViewData["Token"] = token;
 
-//             var friendRequest = await _context.FriendRequests.FindAsync(id);
-//             if (friendRequest == null)
-//             {
-//                 return NotFound();
-//             }
-//             ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.ReceiverId);
-//             ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
-//             return View(friendRequest);
-//         }
+            var friendRequests = await _context.FriendRequests
+                .Include(f => f.Sender) // Include the sender information
+                .Where(f => f.RecipientId == userIdInt)
+                .ToListAsync();
 
-//         // POST: FriendRequests/Edit/5
-//         // To protect from overposting attacks, enable the specific properties you want to bind to.
-//         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Edit(int id, [Bind("Id,SenderId,ReceiverId,Status")] FriendRequest friendRequest)
-//         {
-//             if (id != friendRequest.Id)
-//             {
-//                 return NotFound();
-//             }
+            return View(friendRequests);
+        }
 
-//             if (ModelState.IsValid)
-//             {
-//                 try
-//                 {
-//                     _context.Update(friendRequest);
-//                     await _context.SaveChangesAsync();
-//                 }
-//                 catch (DbUpdateConcurrencyException)
-//                 {
-//                     if (!FriendRequestExists(friendRequest.Id))
-//                     {
-//                         return NotFound();
-//                     }
-//                     else
-//                     {
-//                         throw;
-//                     }
-//                 }
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.ReceiverId);
-//             ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
-//             return View(friendRequest);
-//         }
 
-//         // GET: FriendRequests/Delete/5
-//         public async Task<IActionResult> Delete(int? id)
-//         {
-//             if (id == null)
-//             {
-//                 return NotFound();
-//             }
+        // GET: FriendRequests/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-//             var friendRequest = await _context.FriendRequests
-//                 .Include(f => f.Receiver)
-//                 .Include(f => f.Sender)
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (friendRequest == null)
-//             {
-//                 return NotFound();
-//             }
+            var friendRequest = await _context.FriendRequests
+                .Include(f => f.Recipient)
+                .Include(f => f.Sender)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (friendRequest == null)
+            {
+                return NotFound();
+            }
 
-//             return View(friendRequest);
-//         }
+            return View(friendRequest);
+        }
 
-//         // POST: FriendRequests/Delete/5
-//         [HttpPost, ActionName("Delete")]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> DeleteConfirmed(int id)
-//         {
-//             var friendRequest = await _context.FriendRequests.FindAsync(id);
-//             if (friendRequest != null)
-//             {
-//                 _context.FriendRequests.Remove(friendRequest);
-//             }
+        [HttpPost]
+        public async Task<IActionResult> Create(int recipientId)
+        {
+            // Get the current user's ID from the claims in the HttpContext
+            var token = Request.Cookies["token"];
 
-//             await _context.SaveChangesAsync();
-//             return RedirectToAction(nameof(Index));
-//         }
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+            }
 
-//         private bool FriendRequestExists(int id)
-//         {
-//             return _context.FriendRequests.Any(e => e.Id == id);
-//         }
-//     }
-// }
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            // Query the database to retrieve the user record based on the user ID
+            var user = await _context.Users.FindAsync(userIdInt);
+
+            // Create a new FriendRequest object with the current user as the sender
+            var friendRequest = new FriendRequest
+            {
+                SenderId = userIdInt,
+                RecipientId = recipientId, // Set the recipient ID
+                SentAt = DateTime.Now,
+                Status = FriendRequestStatus.Pending // Set the status to "Pending"
+            };
+
+            // Add the friend request to the context and save changes
+            _context.FriendRequests.Add(friendRequest);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
+
+
+
+        // GET: FriendRequests/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var friendRequest = await _context.FriendRequests.FindAsync(id);
+            if (friendRequest == null)
+            {
+                return NotFound();
+            }
+            ViewData["RecipientId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.RecipientId);
+            ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
+            return View(friendRequest);
+        }
+
+        // POST: FriendRequests/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,SenderId,ReceiverId,Status")] FriendRequest friendRequest)
+        {
+            if (id != friendRequest.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(friendRequest);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FriendRequestExists(friendRequest.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["RecipientId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.RecipientId);
+            ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
+            return View(friendRequest);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            // Get the current user ID from the claims in the HttpContext
+            var token = Request.Cookies["token"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // Return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int currentUserId))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            var friendRequest = await _context.FriendRequests.FindAsync(id);
+
+            // Check if the friend request exists and if the current user is the recipient
+            if (friendRequest != null && friendRequest.RecipientId == currentUserId)
+            {
+                _context.FriendRequests.Remove(friendRequest);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return StatusCode(403, new { message = "Not permitted to delete request" });
+            }
+
+            return Ok(new { success = true });
+        }
+
+
+        private bool FriendRequestExists(int id)
+        {
+            return _context.FriendRequests.Any(e => e.Id == id);
+        }
+    }
+}

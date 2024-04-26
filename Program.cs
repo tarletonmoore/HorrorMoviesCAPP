@@ -183,6 +183,24 @@ app.MapControllerRoute(
     defaults: new { controller = "Favorites", action = "CheckIfInFavorites" }
 );
 
+app.MapControllerRoute(
+    name: "friendrequests",
+    pattern: "FriendRequests",
+    defaults: new { controller = "FriendRequests", action = "Index" }
+);
+
+app.MapControllerRoute(
+    name: "friendrequests",
+    pattern: "FriendRequests/Create",
+    defaults: new { controller = "FriendRequests", action = "Create" }
+);
+
+app.MapControllerRoute(
+    name: "friendrequests",
+    pattern: "FriendRequests/Delete/{id}",
+    defaults: new { controller = "FriendRequests", action = "Delete" }
+);
+
 
 app.MapFallbackToController("Index", "Movies");
 

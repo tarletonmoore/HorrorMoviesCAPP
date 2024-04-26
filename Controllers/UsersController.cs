@@ -114,6 +114,7 @@ namespace MyHorrorMovieApp.Controllers
             bool isAdmin = user.Admin;
             ViewData["IsAdmin"] = isAdmin;
             ViewData["CurrentUserId"] = userIdInt;
+            ViewData["ProfileId"] = user.Id;
 
 
             return View("Details", user); // Assuming "Details" is the name of your view for displaying user profiles

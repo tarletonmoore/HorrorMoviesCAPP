@@ -14,7 +14,7 @@ namespace MyHorrorMovieApp.Models
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
 
-        // public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
 
 
 
@@ -41,25 +41,25 @@ namespace MyHorrorMovieApp.Models
                 .WithMany(m => m.Favorites)
                 .HasForeignKey(f => f.MovieId);
 
-            //       modelBuilder.Entity<FriendRequest>()
-            // .HasOne(fr => fr.Receiver)
-            // .WithMany(u => u.ReceivedFriendRequests)
-            // .HasForeignKey(fr => fr.ReceiverId)
-            // .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Sender)
+                .WithMany(u => u.SentFriendRequests)
+                .HasForeignKey(fr => fr.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //       modelBuilder.Entity<FriendRequest>()
-            //           .HasOne(fr => fr.Sender)
-            //           .WithMany(u => u.SentFriendRequests)
-            //           .HasForeignKey(fr => fr.SenderId)
-            //           .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Recipient)
+                .WithMany(u => u.ReceivedFriendRequests)
+                .HasForeignKey(fr => fr.RecipientId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-
+            modelBuilder.Entity<User>().HasData(
+      new User { Id = 1, Username = "tarleton", Password = "password" },
+      new User { Id = 2, Username = "test", Password = "password" }
+  );
 
             // Seed data
-            modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Username = "tarleton", Password = "password" },
-                new User { Id = 2, Username = "test", Password = "password" }
-            );
+
 
             modelBuilder.Entity<Movie>().HasData(
                      new Movie { Id = 1, Title = "Texas Chainsaw Massacre", Image = "https://m.media-amazon.com/images/M/MV5BMTU1MzY2NDc2MV5BMl5BanBnXkFtZTgwMTc3MTUzMzI@._V1_.jpg", Plot = "Default plot for Texas Chainsaw Massacre" },
