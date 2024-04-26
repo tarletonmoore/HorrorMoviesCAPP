@@ -78,6 +78,41 @@ namespace MyHorrorMovieApp.Controllers
             return View(friendRequest);
         }
 
+        [HttpGet("FriendRequests/HasPendingFriendRequest")]
+        public async Task<IActionResult> HasPendingFriendRequest(int profileId)
+        {
+            var token = Request.Cookies["token"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            if (!int.TryParse(userId, out int currentUserId))
+            {
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
+            }
+
+            ViewData["Token"] = token;
+
+            // Check if there's a pending friend request between the current user and the profile user
+            var hasPendingRequest = await _context.FriendRequests
+          .AnyAsync(fr =>
+              (fr.SenderId == currentUserId && fr.RecipientId == profileId ||
+               fr.SenderId == profileId && fr.RecipientId == currentUserId) &&
+              fr.Status == FriendRequestStatus.Pending);
+
+            return Json(new { hasPendingRequest });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(int recipientId)
         {

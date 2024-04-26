@@ -68,6 +68,13 @@ namespace MyHorrorMovieApp.Controllers
             ViewData["IsAdmin"] = isAdmin;
             ViewData["Token"] = token;
             ViewData["CurrentUserId"] = userIdInt;
+            ViewData["ProfileId"] = user.Id;
+
+
+            var pendingRequestsCount = await _context.FriendRequests
+                  .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
+
+            ViewData["PendingRequestsCount"] = pendingRequestsCount;
 
 
             return View(user);
@@ -93,10 +100,8 @@ namespace MyHorrorMovieApp.Controllers
             var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
 
-            // Convert userId to integer
             if (!int.TryParse(userId, out int userIdInt))
             {
-                // Handle invalid userId here, such as returning an error response
                 return BadRequest("Invalid userId format.");
             }
             // Retrieve the user based on the provided username
@@ -107,17 +112,24 @@ namespace MyHorrorMovieApp.Controllers
 
             if (user == null)
             {
-                // Handle case where user with the given username is not found
+
                 return NotFound();
             }
 
-            bool isAdmin = user.Admin;
-            ViewData["IsAdmin"] = isAdmin;
+            var currentUser = await _context.Users.FindAsync(userIdInt);
+
+
+            ViewData["IsAdmin"] = currentUser.Admin;
             ViewData["CurrentUserId"] = userIdInt;
             ViewData["ProfileId"] = user.Id;
 
+            var pendingRequestsCount = await _context.FriendRequests
+                  .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
 
-            return View("Details", user); // Assuming "Details" is the name of your view for displaying user profiles
+            ViewData["PendingRequestsCount"] = pendingRequestsCount;
+
+
+            return View("Details", user);
         }
 
 

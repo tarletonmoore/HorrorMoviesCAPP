@@ -38,7 +38,12 @@
         </li>
         <li style="display: inline-block; margin-right: 10px;">
             <a href="/FriendRequests" style="text-decoration: none;">
-                <button class="btn btn-primary">Friend Requests</button>
+                <button class="btn btn-primary">Friend Requests
+                    @if (ViewData["PendingRequestsCount"] != null && (int)ViewData["PendingRequestsCount"] > 0)
+                    {
+                        <span class="badge bg-danger">@(ViewData["PendingRequestsCount"])</span>
+                    }
+                </button>
             </a>
         </li>
         <a href="/Movies" style="text-decoration: none;">

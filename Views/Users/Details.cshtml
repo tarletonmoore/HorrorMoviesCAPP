@@ -40,11 +40,17 @@
             </a>
         </li>
 }
-   <li style="display: inline-block; margin-right: 10px;">
-                    <a href="/FriendRequests" style="text-decoration: none;">
-                        <button class="btn btn-primary">Friend Requests</button>
-                    </a>
-                </li>
+        <li style="display: inline-block; margin-right: 10px;">
+    <a href="/FriendRequests" style="text-decoration: none;">
+        <button class="btn btn-primary">Friend Requests 
+            @if (ViewData["PendingRequestsCount"] != null && (int)ViewData["PendingRequestsCount"] > 0)
+            {
+                <span class="badge bg-danger">@(ViewData["PendingRequestsCount"])</span>
+            }
+        </button>
+    </a>
+</li>
+
             @if ((bool)ViewData["IsAdmin"])
             {
                 <li style="display: inline-block; margin-right: 10px;">
@@ -64,7 +70,7 @@
 
     <h1>@Model.Username's Profile</h1>
          @if(Model.Id != currentUserId){
-            <button class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
+          <button id="addFriendBtn" class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
             }
 
     <div>
@@ -126,6 +132,35 @@
 
 <script>
     var token = '@ViewData["Token"]';
+
+$(document).ready(function() {
+
+    $.ajax({
+        type: 'GET',
+        url: '/FriendRequests/HasPendingFriendRequest',
+        data: {
+            profileId: @profileId
+        },
+        success: function (response) {
+            if (response.hasPendingRequest) {
+                // There's a pending friend request, display the "Pending" button
+                $('#addFriendBtn').text('Pending');
+                $('#addFriendBtn').prop('disabled', true); // Disable the button
+            } else {
+                // No pending friend request, display the "Add Friend" button
+                $('#addFriendBtn').text('Add Friend');
+                $('#addFriendBtn').prop('disabled', false); // Enable the button
+            }
+        },
+        error: function (xhr, status, error) {
+            // Handle error
+            console.error('Error checking pending friend request:', error);
+        }
+    });
+    
+});
+
+
 
 function addFriend(profileId) {
 

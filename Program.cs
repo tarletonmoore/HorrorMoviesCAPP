@@ -201,6 +201,12 @@ app.MapControllerRoute(
     defaults: new { controller = "FriendRequests", action = "Delete" }
 );
 
+app.MapControllerRoute(
+        name: "friendRequests",
+        pattern: "FriendRequests/HasPendingFriendRequest",
+        defaults: new { controller = "FriendRequests", action = "HasPendingFriendRequest" });
+
+
 
 app.MapFallbackToController("Index", "Movies");
 

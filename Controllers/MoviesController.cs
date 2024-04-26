@@ -66,6 +66,11 @@ namespace MyHorrorMovieApp.Controllers
                         .ThenInclude(r => r.User)
                     .ToListAsync();
 
+                var pendingRequestsCount = await _context.FriendRequests
+                     .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
+
+                ViewData["PendingRequestsCount"] = pendingRequestsCount;
+
                 // Return the view with movies data
                 return View(moviesWithReviewsAndUsers);
             }
@@ -133,6 +138,11 @@ namespace MyHorrorMovieApp.Controllers
                 return NotFound();
             }
 
+            var pendingRequestsCount = await _context.FriendRequests
+                         .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
+
+            ViewData["PendingRequestsCount"] = pendingRequestsCount;
+
             return View(movie);
         }
 
@@ -175,6 +185,10 @@ namespace MyHorrorMovieApp.Controllers
 
             if (isAdmin)
             {
+                var pendingRequestsCount = await _context.FriendRequests
+                         .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
+
+                ViewData["PendingRequestsCount"] = pendingRequestsCount;
                 return View();
             }
             else
