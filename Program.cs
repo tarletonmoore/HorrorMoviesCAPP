@@ -108,6 +108,12 @@ app.MapControllerRoute(
 );
 
 app.MapControllerRoute(
+    name: "users",
+    pattern: "Users/Search",
+    defaults: new { controller = "Users", action = "Search" }
+);
+
+app.MapControllerRoute(
     name: "me",
     pattern: "me",
     defaults: new { controller = "Users", action = "Details" }

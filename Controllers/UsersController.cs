@@ -132,6 +132,20 @@ namespace MyHorrorMovieApp.Controllers
             return View("Details", user);
         }
 
+        public async Task<IActionResult> Search(string username)
+        {
+
+            // If no exact match is found, search for closely related users
+            var closelyRelatedUsers = await _context.Users
+                .Where(u => u.Username.Contains(username))
+                .ToListAsync();
+
+            // Pass the closely related users to the view
+            return View(closelyRelatedUsers);
+
+        }
+
+
 
         // GET: Users/Create
         public IActionResult Create()
