@@ -3,10 +3,9 @@
 @{
     ViewData["Title"] = "Details";
         int currentUserId = (int)ViewData["CurrentUserId"];
-        @* int profileId = (int)ViewData["ProfileId"]; *@
             int? profileId = ViewData["ProfileId"] as int?;
 
-
+bool areFriends = (bool)ViewData["AreFriends"];
 }
 
 <head>
@@ -70,8 +69,30 @@
 
     <h1>@Model.Username's Profile</h1>
          @if(Model.Id != currentUserId){
-          <button id="addFriendBtn" class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
+            @if (areFriends){
+<button class="btn btn-primary" onclick="removeFriend(@profileId)">Remove Friend</button>
             }
+            else{
+          <button id="addFriendBtn" class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
+          }
+            }
+
+<h2>Friends</h2>
+@if (Model != null && Model.Friendships.Any())
+{
+    <ul>
+        @foreach (var friendship in Model.Friendships)
+        {
+            <li>@friendship.Friend.Username</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No friends yet.</p>
+}
+
+
 
     <div>
         <hr />
@@ -160,7 +181,10 @@ $(document).ready(function() {
     
 });
 
-
+function removeFriend(profileId){
+    console.log(profileId)
+    console.log("Finish Him!!!")
+}
 
 function addFriend(profileId) {
 

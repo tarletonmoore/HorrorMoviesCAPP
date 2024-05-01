@@ -61,6 +61,8 @@ namespace MyHorrorMovieApp.Controllers
             var user = await _context.Users
                 .Include(u => u.Favorites)
                     .ThenInclude(f => f.Movie)
+                    .Include(u => u.Friendships)
+        .ThenInclude(f => f.Friend)
                 .SingleOrDefaultAsync(u => u.Id == userIdInt);
 
 
@@ -108,16 +110,20 @@ namespace MyHorrorMovieApp.Controllers
             var user = await _context.Users
                 .Include(u => u.Favorites)
                     .ThenInclude(f => f.Movie)
+                         .Include(u => u.Friendships)
+        .ThenInclude(f => f.Friend)
                 .SingleOrDefaultAsync(u => u.Username == username);
 
             if (user == null)
             {
+                return RedirectToAction("Index", "Movies");
 
-                return NotFound();
             }
 
             var currentUser = await _context.Users.FindAsync(userIdInt);
-
+            bool areFriends = user.Friendships.Any(f => f.FriendId == userIdInt);
+            System.Console.WriteLine("FRIENDS????? {0}", areFriends);
+            ViewData["AreFriends"] = areFriends;
 
             ViewData["IsAdmin"] = currentUser.Admin;
             ViewData["CurrentUserId"] = userIdInt;

@@ -29,6 +29,7 @@ if (secretKey == null)
 
 builder.Services.AddScoped<AuthService>(); // Register AuthService
 builder.Services.AddScoped<PasswordHashingService>();
+builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -211,6 +212,11 @@ app.MapControllerRoute(
         name: "friendRequests",
         pattern: "FriendRequests/HasPendingFriendRequest",
         defaults: new { controller = "FriendRequests", action = "HasPendingFriendRequest" });
+
+app.MapControllerRoute(
+        name: "friendrequests",
+        pattern: "friendrequests/accept/{friendRequestId}",
+        defaults: new { controller = "FriendRequests", action = "Accept" });
 
 
 

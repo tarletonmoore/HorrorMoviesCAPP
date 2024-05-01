@@ -7,17 +7,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
 using System.IdentityModel.Tokens.Jwt;
+using MyHorrorMovieApp.Services;
+
 
 
 namespace MyHorrorMovieApp.Controllers
 {
+
     public class FriendRequestsController : Controller
     {
         private readonly MyDbContext _context;
+        private readonly IFriendRequestService _friendRequestService;
 
-        public FriendRequestsController(MyDbContext context)
+
+        public FriendRequestsController(MyDbContext context, IFriendRequestService friendRequestService)
         {
             _context = context;
+            _friendRequestService = friendRequestService;
+
         }
 
         // GET: FriendRequests
@@ -51,7 +58,7 @@ namespace MyHorrorMovieApp.Controllers
 
             var friendRequests = await _context.FriendRequests
                 .Include(f => f.Sender) // Include the sender information
-                .Where(f => f.RecipientId == userIdInt)
+                .Where(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending)
                 .ToListAsync();
 
             return View(friendRequests);
@@ -139,19 +146,33 @@ namespace MyHorrorMovieApp.Controllers
             }
 
             // Query the database to retrieve the user record based on the user ID
-            var user = await _context.Users.FindAsync(userIdInt);
+            var sender = await _context.Users.FindAsync(userIdInt);
+            var recipient = await _context.Users.FindAsync(recipientId);
 
+            // Check if sender or recipient is null
+            if (sender == null || recipient == null)
+            {
+                return BadRequest("Sender or recipient not found.");
+            }
             // Create a new FriendRequest object with the current user as the sender
             var friendRequest = new FriendRequest
             {
                 SenderId = userIdInt,
                 RecipientId = recipientId, // Set the recipient ID
                 SentAt = DateTime.Now,
-                Status = FriendRequestStatus.Pending // Set the status to "Pending"
+                Status = FriendRequestStatus.Pending, // Set the status to "Pending"
+                Sender = sender,
+                Recipient = recipient
             };
 
             // Add the friend request to the context and save changes
             _context.FriendRequests.Add(friendRequest);
+
+            // sender.SentFriendRequests.Add(friendRequest);
+
+            // // Add the friend request to the recipient's received requests
+            // recipient.ReceivedFriendRequests.Add(friendRequest);
+
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true });
@@ -178,41 +199,50 @@ namespace MyHorrorMovieApp.Controllers
             return View(friendRequest);
         }
 
-        // POST: FriendRequests/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SenderId,ReceiverId,Status")] FriendRequest friendRequest)
+        public async Task<IActionResult> Accept(int friendRequestId)
         {
-            if (id != friendRequest.Id)
+            var token = Request.Cookies["token"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // return an error response or redirect the user to log in
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            // Retrieve the user ID from the token's payload
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            var friendRequest = await _context.FriendRequests.FindAsync(friendRequestId);
+            Console.WriteLine("SENDER ID: {0}", friendRequest.SenderId);
+            Console.WriteLine("Recipient ID: {0}", friendRequest.RecipientId);
+
+
+            if (friendRequest == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Convert userId to integer
+            if (!int.TryParse(userId, out int currentUserId))
             {
-                try
-                {
-                    _context.Update(friendRequest);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FriendRequestExists(friendRequest.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                // Handle invalid userId here, such as returning an error response
+                return BadRequest("Invalid userId format.");
             }
-            ViewData["RecipientId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.RecipientId);
-            ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Password", friendRequest.SenderId);
-            return View(friendRequest);
+            if (friendRequest.RecipientId != currentUserId)
+            {
+
+                return Unauthorized();
+            }
+            // Call the service method to accept the friend request
+            _friendRequestService.AcceptFriendRequest(friendRequestId);
+
+            // Redirect the user to a different page (e.g., home page or friend list)
+            return RedirectToAction("Index");
         }
 
         [HttpDelete]

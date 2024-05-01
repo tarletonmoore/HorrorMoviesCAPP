@@ -110,8 +110,23 @@ else
 <script>
     var token = '@ViewData["Token"]';
     function acceptFriend(requestId) {
-        console.log("Accepted friend request with ID: " + requestId);
+        console.log(requestId)
+        $.ajax({
+            url: '/friendrequests/accept/' + requestId,
+            type: 'POST',
+            success: function (response) {
+                // Handle success response if needed
+                console.log('Friend request accepted');
+                // Redirect to a different page if necessary
+                window.location.reload()
+            },
+            error: function (xhr, status, error) {
+                // Handle error response if needed
+                console.error('Error accepting friend request:', error);
+            }
+        });
     }
+
 
     function declineFriend(requestId) {
         event.preventDefault();

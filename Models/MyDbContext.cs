@@ -16,6 +16,7 @@ namespace MyHorrorMovieApp.Models
 
         public DbSet<FriendRequest> FriendRequests { get; set; }
 
+        public DbSet<Friendship> Friendships { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,13 +46,30 @@ namespace MyHorrorMovieApp.Models
                 .HasOne(fr => fr.Sender)
                 .WithMany(u => u.SentFriendRequests)
                 .HasForeignKey(fr => fr.SenderId)
+                .HasPrincipalKey(u => u.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FriendRequest>()
                 .HasOne(fr => fr.Recipient)
                 .WithMany(u => u.ReceivedFriendRequests)
                 .HasForeignKey(fr => fr.RecipientId)
+                .HasPrincipalKey(u => u.Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Friendship>()
+         .HasKey(f => new { f.UserId, f.FriendId });
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.Friendships)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // or other delete behavior
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.Friend)
+                .WithMany() // Since you don't have a navigation property for friends in Friendship, use WithMany()
+                .HasForeignKey(f => f.FriendId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>().HasData(
       new User { Id = 1, Username = "tarleton", Password = "password" },

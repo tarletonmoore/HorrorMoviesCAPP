@@ -23,7 +23,7 @@ namespace MyHorrorMovieApp.Models
     public ICollection<FriendRequest> SentFriendRequests { get; set; } = new List<FriendRequest>();
     public ICollection<FriendRequest> ReceivedFriendRequests { get; set; } = new List<FriendRequest>();
 
-    // public ICollection<User> Friends { get; set; } = new List<User>();
+    public ICollection<Friendship> Friendships { get; set; } = new List<Friendship>();
 
 
   }
