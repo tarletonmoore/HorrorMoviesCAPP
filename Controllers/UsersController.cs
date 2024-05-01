@@ -65,6 +65,8 @@ namespace MyHorrorMovieApp.Controllers
         .ThenInclude(f => f.Friend)
                 .SingleOrDefaultAsync(u => u.Id == userIdInt);
 
+            bool areFriends = user.Friendships.Any(f => f.FriendId == userIdInt);
+            ViewData["AreFriends"] = areFriends;
 
             bool isAdmin = user != null && user.Admin;
             ViewData["IsAdmin"] = isAdmin;
@@ -121,8 +123,9 @@ namespace MyHorrorMovieApp.Controllers
             }
 
             var currentUser = await _context.Users.FindAsync(userIdInt);
+
             bool areFriends = user.Friendships.Any(f => f.FriendId == userIdInt);
-            System.Console.WriteLine("FRIENDS????? {0}", areFriends);
+            // System.Console.WriteLine("FRIENDS????? {0}", areFriends);
             ViewData["AreFriends"] = areFriends;
 
             ViewData["IsAdmin"] = currentUser.Admin;

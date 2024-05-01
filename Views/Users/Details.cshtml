@@ -71,12 +71,13 @@ bool areFriends = (bool)ViewData["AreFriends"];
          @if(Model.Id != currentUserId){
             @if (areFriends){
 <button class="btn btn-primary" onclick="removeFriend(@profileId)">Remove Friend</button>
+<br/>
             }
             else{
           <button id="addFriendBtn" class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
           }
             }
-
+<br/>
 <h2>Friends</h2>
 @if (Model != null && Model.Friendships.Any())
 {
