@@ -6,6 +6,7 @@
             int? profileId = ViewData["ProfileId"] as int?;
 
 bool areFriends = (bool)ViewData["AreFriends"];
+string profilePicture = (string)ViewData["ProfilePicture"];
 }
 
 <head>
@@ -67,7 +68,23 @@ bool areFriends = (bool)ViewData["AreFriends"];
         </ul>
     </nav>
 
+@if (String.IsNullOrEmpty(Model.ProfilePictureUrl))
+{
+    <img src="https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg" alt="blank image">
+}
+else
+{
+    <img src="@Model.ProfilePictureUrl" alt="Profile Picture">
+}
+
     <h1>@Model.Username's Profile</h1>
+      @if(Model.Id == currentUserId){
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#editModal">
+                                    Edit
+                                </button>
+                                <br/>
+    }
          @if(Model.Id != currentUserId){
             @if (areFriends){
 <button class="btn btn-primary" onclick="removeFriend(@profileId)">Remove Friend</button>
@@ -152,6 +169,33 @@ else
 
 </div>
 
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content border border-light">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel" style="color: #fff;">Edit Profile</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                style="background-color: #fff;"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Edit Form -->
+                            <form id="editForm">
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: #fff;">Profile Picture</label>
+                                    <input type="text" name="ProfilePictureUrl" class="form-control" id="ProfilePictureUrl"
+                                        value="@Model.ProfilePictureUrl">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="saveProfileChanges()">Save
+                                changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 <script>
     var token = '@ViewData["Token"]';
 
@@ -181,6 +225,37 @@ $(document).ready(function() {
     });
     
 });
+
+
+ function saveProfileChanges() {
+                    // Extract data from the form
+                    var id = @Model.Id; // Get the movie ID from the model
+                    var picture = document.getElementById('ProfilePictureUrl').value;
+
+
+                    // Send AJAX request to update movie details
+                    $.ajax({
+                        type: 'POST',
+                        url: `/Users/Edit/${id}`,
+                        data: {
+                            Id: id,
+                            ProfilePictureUrl: picture
+                           
+                        },
+                        success: function (response) {
+                window.location.href = `/me`;
+                                @* window.location.href = `/Users/Profile/@Model.Username`; *@
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            console.error('Error updating movie:', error);
+                        }
+                    });
+
+                    // Close the modal
+                    $('#editModal').modal('hide');
+                }
+
 
 function removeFriend(profileId){
     console.log(profileId)
@@ -258,4 +333,9 @@ function addFriend(profileId) {
         background-color: #4d0000;
         color: #fff;
     }
+
+      .modal-content {
+                background-color: #4d0000;
+
+            }
 </style>

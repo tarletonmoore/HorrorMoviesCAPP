@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyHorrorMovieApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ffc4a9103f75241c83c3c871e2b5dcbea3a7c116")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b2deb41352e009617ce7e033c1caf0c589d5bdb")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyHorrorMovieApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyHorrorMovieApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

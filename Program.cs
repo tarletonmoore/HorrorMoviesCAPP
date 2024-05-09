@@ -115,6 +115,12 @@ app.MapControllerRoute(
 );
 
 app.MapControllerRoute(
+    name: "users",
+    pattern: "Users/Edit/{id}",
+    defaults: new { controller = "Users", action = "Edit" }
+);
+
+app.MapControllerRoute(
     name: "me",
     pattern: "me",
     defaults: new { controller = "Users", action = "Details" }

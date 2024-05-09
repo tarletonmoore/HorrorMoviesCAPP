@@ -73,7 +73,8 @@ namespace MyHorrorMovieApp.Controllers
             ViewData["Token"] = token;
             ViewData["CurrentUserId"] = userIdInt;
             ViewData["ProfileId"] = user.Id;
-
+            ViewData["ProfilePicture"] = user.ProfilePictureUrl;
+            System.Console.WriteLine("Profile Picture {0}", user.ProfilePictureUrl);
 
             var pendingRequestsCount = await _context.FriendRequests
                   .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
@@ -131,6 +132,7 @@ namespace MyHorrorMovieApp.Controllers
             ViewData["IsAdmin"] = currentUser.Admin;
             ViewData["CurrentUserId"] = userIdInt;
             ViewData["ProfileId"] = user.Id;
+            ViewData["ProfilePicture"] = user.ProfilePictureUrl;
 
             var pendingRequestsCount = await _context.FriendRequests
                   .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
@@ -213,39 +215,55 @@ namespace MyHorrorMovieApp.Controllers
         }
 
         // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ProfilePictureUrl")] User user)
         {
-            if (id != user.Id)
+            var token = Request.Cookies["token"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                return BadRequest("Invalid userId format.");
+            }
+
+            if (user.Id != userIdInt)
+            {
+                return Forbid();
+            }
+
+            var currentUser = await _context.Users.FindAsync(userIdInt);
+
+            if (currentUser == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Update the profile picture URL
+            currentUser.ProfilePictureUrl = user.ProfilePictureUrl;
+
+            try
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                // Update the user in the database
+                _context.Update(currentUser);
+                await _context.SaveChangesAsync();
+                return Ok(new { success = true }); // Redirect to the user details page
             }
-            return View(user);
+            catch (DbUpdateException)
+            {
+                // Log the error or handle it accordingly
+                return View(user); // Return to the edit view with the user model
+            }
         }
+
 
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
