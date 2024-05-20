@@ -7,6 +7,7 @@
 
 bool areFriends = (bool)ViewData["AreFriends"];
 string profilePicture = (string)ViewData["ProfilePicture"];
+   var defaultProfilePictureUrl = "https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg";
 }
 
 <head>
@@ -97,19 +98,34 @@ else
             }
 <br/>
 <h2>Friends</h2>
+<div class="card friendscard">
 @if (Model != null && Model.Friendships.Any())
 {
-    <ul>
-        @foreach (var friendship in Model.Friendships)
+<div class="row">
+    @foreach (var friendship in Model.Friendships)
         {
-            <li>@friendship.Friend.Username</li>
+            var profilePictureUrl = string.IsNullOrEmpty(friendship.Friend.ProfilePictureUrl) ? defaultProfilePictureUrl : friendship.Friend.ProfilePictureUrl;
+
+            <div class="col-4 p-1 d-flex justify-content-center">
+
+                <div class="card profile-card text-center">
+                     <a href="/Users/Profile/@friendship.Friend.Username">
+                    <img src="@profilePictureUrl" class="img-thumbnail"
+                  style="width: 150px; height: 150px;"> </a>    
+                     
+                    <div class="card-body">
+                        <h5 class="card-title">@friendship.Friend.Username</h5>
+                    </div>
+                </div>
+            </div>
         }
-    </ul>
+</div>
 }
 else
 {
     <p>No friends yet.</p>
 }
+</div>
 
 
 
@@ -163,7 +179,6 @@ else
 
         </div>
     </div>
-  
 
 </div>
 
@@ -342,4 +357,11 @@ function addFriend(profileId) {
                 background-color: #4d0000;
 
             }
+
+     .friendscard {
+        padding-top: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        width: 500px;
+    }
 </style>

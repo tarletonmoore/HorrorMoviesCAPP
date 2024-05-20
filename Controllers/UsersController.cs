@@ -146,6 +146,35 @@ namespace MyHorrorMovieApp.Controllers
 
         public async Task<IActionResult> Search(string username)
         {
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Auth");
+
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+
+            var userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+
+
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                return BadRequest("Invalid userId format.");
+            }
+
+            var currentUser = await _context.Users.FindAsync(userIdInt);
+
+            var pendingRequestsCount = await _context.FriendRequests
+                 .CountAsync(f => f.RecipientId == userIdInt && f.Status == FriendRequestStatus.Pending);
+
+            ViewData["PendingRequestsCount"] = pendingRequestsCount;
+
+
+            ViewData["IsAdmin"] = currentUser.Admin;
 
             // If no exact match is found, search for closely related users
             var closelyRelatedUsers = await _context.Users
