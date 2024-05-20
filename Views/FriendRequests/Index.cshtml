@@ -90,14 +90,24 @@
         <div class="col-md-4 mb-4">
     <div class="friend-request-card">
         <h5>Friend Request</h5>
-        <p><strong>Sender:</strong> @request.Sender.Username</p>
-        <p><strong>Status:</strong> @request.Status</p>
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-success mr-2" onclick="acceptFriend(@request.Id)">Accept</button>
-            <button class="btn btn-danger" onclick="declineFriend(@request.Id)">Decline</button>
+        @if (String.IsNullOrEmpty(request.Sender.ProfilePictureUrl))
+                {
+                    <img src="https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg"
+                        alt="blank image" class="img-thumbnail" style="width: 150px; height: 150px;">
+                }
+                else
+                {
+                    <img src="@request.Sender.ProfilePictureUrl" alt="Profile Picture" class="img-thumbnail"
+                        style="width: 150px; height: 150px;">
+                }
+                <p><strong>Sender:</strong> @request.Sender.Username</p>
+                <p><strong>Status:</strong> @request.Status</p>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-success mr-2" onclick="acceptFriend(@request.Id)">Accept</button>
+                    <button class="btn btn-danger" onclick="declineFriend(@request.Id)">Decline</button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
     }
 }
 else

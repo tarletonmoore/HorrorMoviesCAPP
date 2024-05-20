@@ -18,8 +18,6 @@ namespace MyHorrorMovieApp.Models
 
     public bool Admin { get; set; }
 
-    [Required]
-    [StringLength(500, MinimumLength = 3, ErrorMessage = "Picture must be at least 3 characters.")]
     public string ProfilePictureUrl { get; set; } = "";
 
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
