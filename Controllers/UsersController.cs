@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using MyHorrorMovieApp.Models;
 using System.IdentityModel.Tokens.Jwt;
 using MyHorrorMovieApp.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MyHorrorMovieApp.Controllers
 {
@@ -201,17 +202,17 @@ namespace MyHorrorMovieApp.Controllers
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            var token = Request.Cookies["token"];
+
+
+            if (string.IsNullOrEmpty(token))
             {
-                return NotFound();
+                return RedirectToAction("Login", "Auth");
+
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
+
+            return RedirectToAction("Index", "Movies");
         }
 
         // POST: Users/Edit/5
@@ -247,7 +248,6 @@ namespace MyHorrorMovieApp.Controllers
                 return NotFound();
             }
 
-            // Update the profile picture URL
             currentUser.ProfilePictureUrl = user.ProfilePictureUrl;
 
             try

@@ -92,6 +92,7 @@ else
             }
             else{
           <button id="addFriendBtn" class="btn btn-primary" onclick="addFriend(@profileId)">Add Friend</button>
+          <br/>
           }
             }
 <br/>
@@ -162,10 +163,7 @@ else
 
         </div>
     </div>
-    @* <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-    </div> *@
+  
 
 </div>
 
@@ -228,10 +226,13 @@ $(document).ready(function() {
 
 
  function saveProfileChanges() {
-                    // Extract data from the form
-                    var id = @Model.Id; // Get the movie ID from the model
+                    var id = @Model.Id; 
                     var picture = document.getElementById('ProfilePictureUrl').value;
-
+ if (picture.trim() === '') {
+        // Display error message
+        alert('Profile picture cannot be blank.');
+        return; // Exit the function
+    }
 
                     // Send AJAX request to update movie details
                     $.ajax({
@@ -244,17 +245,20 @@ $(document).ready(function() {
                         },
                         success: function (response) {
                 window.location.href = `/me`;
-                                @* window.location.href = `/Users/Profile/@Model.Username`; *@
+                              
                         },
                         error: function (xhr, status, error) {
                             // Handle error
-                            console.error('Error updating movie:', error);
+                            console.error('Error updating User:', error);
+                           
                         }
                     });
 
                     // Close the modal
                     $('#editModal').modal('hide');
                 }
+
+
 
 
 function removeFriend(profileId){
